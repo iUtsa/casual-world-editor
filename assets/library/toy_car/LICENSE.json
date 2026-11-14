@@ -1,0 +1,9 @@
+{
+ "license": "CC0-1.0",
+ "source": "https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/ToyCar",
+ "authors": [
+  "Guido Odendahl",
+  "Eric Chadwick"
+ ],
+ "name": "Toy Car"
+}
