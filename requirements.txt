@@ -1,0 +1,30 @@
+# Python 3.12. On this machine the venv reuses the system torch 2.6 (--system-site-packages).
+torch==2.6.0
+transformers>=4.56          # SAM 2.1 + Depth Anything V2 (tested 5.22.2)
+mujoco>=3.2                 # tested 4.0.0
+opencv-python-headless>=4.11
+numpy>=2
+anthropic>=2.0              # optional at runtime: only used when credentials exist
+fastapi>=0.115
+uvicorn>=0.25
+python-multipart
+pydantic>=2
+pillow>=11
+qrcode>=8                   # phone connection QR code
+# space: N-body gravity (IAS15) and effects
+rebound>=5.2
+reboundx>=5.1
+# chemistry: structures, balancing, semi-empirical and DFT energies
+rdkit>=2025.3
+sympy>=1.13
+tblite>=0.4                 # GFN2-xTB
+pyscf>=2.15                 # M06-2X/def2-TZVP for molecules without measured data
+scipy>=1.15
+sentence-transformers>=5.1  # matching names to library objects
+# sweep scan: meshes, marching cubes, convex decomposition for physics
+trimesh>=4
+scikit-image>=0.25
+coacd>=1.0
+# dev / tests
+pytest
+playwright
