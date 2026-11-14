@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0b1020" />
+<title>Phone Camera</title>
+<style>
+  :root { --bg: #0b1020; --panel: #121a2e; --ink: #e5e7eb; --muted: #94a3b8; --accent: #38bdf8; --ok: #34d399; --warn: #fbbf24; --danger: #f87171; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.4 system-ui, -apple-system, sans-serif;
+         min-height: 100vh; display: flex; flex-direction: column; padding: env(safe-area-inset-top) 16px env(safe-area-inset-bottom); }
+  header { padding: 14px 0 10px; display: flex; align-items: center; gap: 10px; }
+  header b { font-size: 17px; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--muted); flex: none; }
+  .dot.on { background: var(--ok); box-shadow: 0 0 8px var(--ok); }
+  .view { position: relative; border-radius: 16px; overflow: hidden; background: #000; aspect-ratio: 4 / 3; width: 100%; }
+  video { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .hint { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 20px; color: var(--muted); }
+  .hud { position: absolute; left: 8px; right: 8px; top: 8px; display: flex; gap: 6px; flex-wrap: wrap; }
+  .tag { background: #000a; color: #fff; padding: 3px 9px; border-radius: 999px; font-size: 12px; }
+  .tag.ok { color: var(--ok); } .tag.warn { color: var(--warn); }
+  .meter { position: absolute; left: 8px; right: 8px; bottom: 8px; height: 6px; border-radius: 3px; background: #ffffff22; overflow: hidden; }
+  .meter i { display: block; height: 100%; width: 0; background: var(--ok); transition: width .15s; }
+  .row { display: flex; gap: 10px; align-items: center; justify-content: center; margin: 16px 0 8px; }
+  button, label.btn { font: inherit; color: var(--ink); background: var(--panel); border: 1px solid #23304d; border-radius: 12px; padding: 12px 16px; }
+  .shutter { width: 78px; height: 78px; border-radius: 50%; border: 5px solid #fff; background: var(--accent); padding: 0; font-weight: 800; color: #0b1020; }
+  .shutter:disabled { opacity: 0.5; }
+  .toggle.on { border-color: var(--ok); color: var(--ok); }
+  #msg { text-align: center; min-height: 24px; color: var(--muted); }
+  #msg.err { color: var(--danger); }
+  .card { background: var(--panel); border-radius: 14px; padding: 12px 14px; margin-top: 8px; font-size: 14px; }
+  .card b { color: var(--accent); }
+  small { color: var(--muted); }
+</style>
+</head>
+<body>
+<header><span class="dot" id="dot"></span><b>Phone camera</b><small id="stat">not streaming</small></header>
+
+<div class="view">
+  <video id="v" playsinline muted autoplay></video>
+  <div class="hint" id="hint">Point at a table or a drawing. Hold the phone steady; landscape works best.</div>
+  <div class="hud"><span class="tag" id="steadyTag">—</span><span class="tag" id="changeTag">—</span><span class="tag" id="macTag">Mac: —</span></div>
+  <div class="meter"><i id="sharp"></i></div>
+</div>
+
+<div class="row">
+  <button class="toggle" id="live">Live to Mac</button>
+  <button class="shutter" id="scan" disabled>Scan</button>
+  <label class="btn" id="photoBtn">Photo<input id="photo" type="file" accept="image/*" capture="environment" hidden /></label>
+</div>
+<div class="row"><button id="sweepBtn" disabled>🎥 3D scan</button></div>
+<div id="msg"></div>
+<div class="card" id="info">
+  <b>Live mode</b>: this phone checks every frame itself (is it steady? is it sharp? did the scene change?) and only asks the Mac to rebuild the 3D world
+  when something on the table changed and the phone is held still. Add or move an object, hold still for a second, and the Mac's 3D world and any
+  running experiment update.
+</div>
+<p><small>Frames go only from this phone to the Mac on your Wi-Fi. If the camera doesn't start, use “Photo”.</small></p>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const v = $("v"), msg = $("msg"), scanBtn = $("scan"), liveBtn = $("live");
+let stream = null, live = false, sending = false, sent = 0, t0 = 0;
+const canvas = document.createElement("canvas");
+const small = document.createElement("canvas"); small.width = 64; small.height = 48;
+const sctx = small.getContext("2d", { willReadFrequently: true });
+let prev = null, ref = null, steadySince = 0, gyro = 0, lastTrigger = 0, macVersion = -1;
+
+function say(t, err) { msg.textContent = t; msg.className = err ? "err" : ""; }
+
+async function startCamera() {
+  if (!navigator.mediaDevices || !window.isSecureContext) { say("Live camera needs the https:// link (scan the QR code). “Photo” works anywhere.", true); return; }
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 960 } }, audio: false });
+    v.srcObject = stream; $("hint").style.display = "none"; scanBtn.disabled = false; sweepBtn.disabled = false;
+    // this phone IS the Mac's camera: stream straight away (tap "Streaming…" to pause)
+    if (!live) { liveBtn.onclick(); say("Streaming to the Mac — point the phone down at your desk. The Mac maps it by itself."); }
+  } catch (e) { say("Camera unavailable: " + e.message + ". Use “Photo”.", true); }
+}
+
+// gyro: rotation rate (deg/s). iOS asks permission on a tap.
+function onMotion(e) { const r = e.rotationRate || {}; gyro = 0.7 * gyro + 0.3 * Math.hypot(r.alpha || 0, r.beta || 0, r.gamma || 0); }
+async function enableMotion() {
+  try {
+    if (typeof DeviceMotionEvent !== "undefined" && DeviceMotionEvent.requestPermission) { if (await DeviceMotionEvent.requestPermission() !== "granted") return; }
+    window.addEventListener("devicemotion", onMotion);
+  } catch (_) { /* frame differencing still works */ }
+}
+
+/** On-phone analysis of the current frame: motion vs the last frame, change vs the last scan, sharpness. */
+function analyse() {
+  sctx.drawImage(v, 0, 0, 64, 48);
+  const d = sctx.getImageData(0, 0, 64, 48).data;
+  const g = new Float32Array(64 * 48);
+  for (let i = 0; i < g.length; i++) g[i] = 0.299 * d[i * 4] + 0.587 * d[i * 4 + 1] + 0.114 * d[i * 4 + 2];
+  let motion = 0, change = 0, lap = 0;
+  if (prev) for (let i = 0; i < g.length; i++) motion += Math.abs(g[i] - prev[i]);
+  motion /= g.length;
+  if (ref) { for (let i = 0; i < g.length; i++) change += Math.abs(g[i] - ref[i]); change /= g.length; } else change = 99;
+  for (let y = 1; y < 47; y++) for (let x = 1; x < 63; x++) { const i = y * 64 + x; const l = 4 * g[i] - g[i - 1] - g[i + 1] - g[i - 64] - g[i + 64]; lap += l * l; }
+  prev = g;
+  return { g, motion, change, sharp: lap / (62 * 46) };
+}
+
+function grab(maxW = 1280, q = 0.85) {
+  return new Promise((res) => {
+    const s = Math.min(1, maxW / v.videoWidth);
+    canvas.width = Math.round(v.videoWidth * s); canvas.height = Math.round(v.videoHeight * s);
+    canvas.getContext("2d").drawImage(v, 0, 0, canvas.width, canvas.height);
+    canvas.toBlob(res, "image/jpeg", q);
+  });
+}
+
+async function send(blob, a) {
+  const f = new FormData(); f.append("image", blob, "frame.jpg");
+  if (a) { f.append("steady", a.steady ? "true" : "false"); f.append("motion", String(a.motion.toFixed(2))); f.append("change", String(a.change.toFixed(2))); }
+  const r = await fetch("/api/remote/frame", { method: "POST", body: f });
+  if (!r.ok) throw new Error("send failed");
+  return r.json();
+}
+
+async function liveLoop() {
+  while (live) {
+    if (!sending && v.videoWidth) {
+      sending = true;
+      try {
+        const a = analyse();
+        const now = performance.now();
+        const still = a.motion < 3.5 && gyro < 10;
+        if (!still) steadySince = 0; else if (!steadySince) steadySince = now;
+        a.steady = still && now - steadySince > 350;
+        $("steadyTag").textContent = a.steady ? "steady" : "moving"; $("steadyTag").className = "tag " + (a.steady ? "ok" : "warn");
+        const changed = a.change > 8;
+        $("changeTag").textContent = ref ? (changed ? "scene changed" : "no change") : "not scanned yet";
+        $("changeTag").className = "tag " + (changed ? "warn" : "ok");
+        $("sharp").style.width = Math.min(100, a.sharp / 6) + "%";
+        const j = await send(await grab(a.steady ? 1280 : 960, a.steady ? 0.88 : 0.7), a);
+        sent++;
+        // changed + held still long enough (and sharp) -> ask the Mac to rebuild the 3D world
+        if (changed && a.steady && now - steadySince > 900 && now - lastTrigger > 2500 && a.sharp > 60 && j.live && j.live.state !== "scanning") {
+          lastTrigger = now; ref = a.g;
+          fetch("/api/live/rescan", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ hfov: 66 }) });
+          say("Scene changed — the Mac is rebuilding the 3D world…");
+        }
+        if (j.live) {
+          $("macTag").textContent = j.live.state === "scanning" ? "Mac: updating 3D…" : j.live.enabled ? "Mac: live" : "Mac: live sync off";
+          if (j.live.version !== macVersion) {
+            if (macVersion >= 0) {
+              const parts = [(j.live.added || []).length ? "+ " + j.live.added.join(", ") : "", (j.live.removed || []).length ? "− " + j.live.removed.join(", ") : ""].filter(Boolean).join("  ");
+              say(j.live.error ? "Update failed: " + j.live.error : "3D world updated" + (parts ? ": " + parts : "") + (j.live.rerun ? " · experiment re-run" : ""), !!j.live.error);
+            }
+            macVersion = j.live.version;
+          }
+        }
+      } catch (e) { say("Lost connection to the Mac", true); }
+      sending = false;
+      const fps = sent / Math.max(0.5, (performance.now() - t0) / 1000);
+      $("stat").textContent = `streaming ${fps.toFixed(1)} fps`;
+    }
+    await new Promise((r) => setTimeout(r, 90));
+  }
+}
+
+liveBtn.onclick = () => {
+  live = !live;
+  liveBtn.classList.toggle("on", live); $("dot").classList.toggle("on", live);
+  liveBtn.textContent = live ? "Streaming…" : "Live to Mac";
+  if (live) { enableMotion(); sent = 0; t0 = performance.now(); liveLoop(); } else $("stat").textContent = "not streaming";
+};
+
+async function scan(blob) {
+  scanBtn.disabled = true;
+  say("Building the 3D world on the Mac…");
+  try {
+    await send(blob, null);
+    const f = new FormData(); f.append("hfov", "66");
+    const r = await fetch("/api/scan_remote", { method: "POST", body: f });
+    const j = await r.json();
+    if (!r.ok) throw new Error(j.detail || r.statusText);
+    if (v.videoWidth) ref = analyse().g;
+    const objs = j.scene.objects.map((o) => o.label);
+    say(`3D world ready on the Mac: ${objs.length} object${objs.length === 1 ? "" : "s"}${objs.length ? " (" + objs.join(", ") + ")" : ""}.`);
+  } catch (e) { say(e.message, true); }
+  finally { scanBtn.disabled = !stream; sweepBtn.disabled = !stream; }
+}
+
+scanBtn.onclick = async () => scan(await grab(1280, 0.92));
+
+// 🎥 3D scan: record a slow walk around the table and send it; the Mac turns every object into a real 3D model
+let rec = null, recTimer = null;
+const sweepBtn = $("sweepBtn");
+function pickMime() {
+  for (const m of ["video/mp4;codecs=avc1", "video/mp4", "video/webm;codecs=vp9", "video/webm"])
+    if (window.MediaRecorder && MediaRecorder.isTypeSupported(m)) return m;
+  return "";
+}
+sweepBtn.onclick = () => {
+  if (rec) { rec.stop(); return; }
+  if (!stream || !window.MediaRecorder) { say("This browser can't record video. Record it with the Camera app and upload it on the Mac (🎥 3D scan).", true); return; }
+  if (live) liveBtn.click();                                  // one job at a time
+  const mime = pickMime();
+  const chunks = [];
+  rec = new MediaRecorder(stream, mime ? { mimeType: mime, videoBitsPerSecond: 8e6 } : undefined);
+  rec.ondataavailable = (e) => { if (e.data.size) chunks.push(e.data); };
+  rec.onstop = async () => {
+    clearInterval(recTimer); rec = null;
+    sweepBtn.textContent = "🎥 3D scan"; sweepBtn.classList.remove("on");
+    const blob = new Blob(chunks, { type: mime || "video/mp4" });
+    const portrait = v.videoHeight > v.videoWidth;
+    const f = new FormData();
+    f.append("video", blob, mime.includes("webm") ? "sweep.webm" : "sweep.mp4");
+    f.append("hfov", portrait ? "50" : "66");                 // iPhone main camera, horizontal field of view
+    say(`Sending ${(blob.size / 1e6).toFixed(0)} MB to the Mac…`);
+    try {
+      const r = await fetch("/api/sweep", { method: "POST", body: f });
+      const j = await r.json();
+      if (!r.ok) throw new Error(j.detail || r.statusText);
+      say("The Mac is building the 3D models (about 2–3 minutes). Leave the phone where it is: that's the live view.");
+    } catch (e) { say(e.message, true); }
+  };
+  rec.start(1000);
+  const t0r = performance.now();
+  sweepBtn.textContent = "■ Stop"; sweepBtn.classList.add("on");
+  say("Walk slowly around the table (left, over the top, right), then come back here and hold still. Tap Stop.");
+  recTimer = setInterval(() => {
+    const s = (performance.now() - t0r) / 1000;
+    $("stat").textContent = `recording ${s.toFixed(0)} s`;
+    if (s > 25) rec && rec.stop();
+  }, 250);
+};
+$("photo").onchange = (e) => { const file = e.target.files[0]; if (file) scan(file); };
+startCamera();
+</script>
+</body>
+</html>
