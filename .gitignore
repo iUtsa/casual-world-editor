@@ -1,0 +1,23 @@
+# Python environments (main app + local AI worker)
+.venv/
+.venv-ai/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Frontend build output and dependencies
+frontend/node_modules/
+frontend/dist/
+*.tsbuildinfo
+
+# Runtime data: scans, caches, logs, model weights, and the auto-generated HTTPS key for phones
+data/
+
+# Local tooling and OS noise
+graphify-out/
+MUJOCO_LOG.TXT
+.DS_Store
+
+# Personal agent setup (ChatOverflow hook and instructions)
+.claude/
+CLAUDE.local.md
