@@ -1129,9 +1129,9 @@ def measure_series(oid: str, segment: int = -1):
 
 # ---------------------------------------------------------------- phone camera
 @app.get("/api/connect")
-def connect():
+def connect(origin: str | None = None):
     from . import remote
-    return remote.connect_info() | {"status": remote.status()}
+    return remote.connect_info(origin) | {"status": remote.status()}
 
 
 @app.post("/api/remote/frame")
