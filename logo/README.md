@@ -18,6 +18,7 @@ same everywhere without any font installed.
 | Square-ish spaces (posters, slides) | [`svg/cwe-logo-stacked.svg`](svg/cwe-logo-stacked.svg) · [`on dark`](svg/cwe-logo-stacked-on-dark.svg) |
 | Just the mark, no background | [`svg/cwe-mark.svg`](svg/cwe-mark.svg) (light bg) · [`svg/cwe-mark-on-dark.svg`](svg/cwe-mark-on-dark.svg) (dark bg) |
 | One colour (print, stamps, embossing) | [`svg/cwe-mark-mono-ink.svg`](svg/cwe-mark-mono-ink.svg) · [`svg/cwe-mark-mono-white.svg`](svg/cwe-mark-mono-white.svg) |
+| Animated logo (README headers, web pages): the ball is thrown along the arc when it loads | [`svg/cwe-logo-horizontal-animated.svg`](svg/cwe-logo-horizontal-animated.svg) · [`on dark`](svg/cwe-logo-horizontal-on-dark-animated.svg) · [`icon`](svg/cwe-icon-animated.svg) |
 | Wordmark alone | [`svg/cwe-wordmark.svg`](svg/cwe-wordmark.svg) · [`on dark`](svg/cwe-wordmark-on-dark.svg) |
 | Website favicon | [`favicon.ico`](favicon.ico) · [`png/cwe-icon-32.png`](png/cwe-icon-32.png) · [`png/cwe-icon-180.png`](png/cwe-icon-180.png) (Apple touch) |
 
