@@ -69,19 +69,26 @@ class HandSession:
         due = self.t + LEAD
         if self.updates and due <= self.updates[-1][0]:
             due = self.updates[-1][0] + 1e-3
-        self.updates.append([round(due, 5), None if J is None else J.round(5).tolist()])
+        due = round(due, 5)
+        J = None if J is None else J.round(5)        # the live run uses exactly what is recorded: a replay is identical
+        self.updates.append([due, None if J is None else J.tolist()])
         self.world.append_hand(self.t0 + due, J)
         target = min(wall - self.wall0, self.t + MAX_CATCHUP)
         dt = float(self.world.m.opt.timestep)
-        while self.t + dt <= target + 1e-9:
+        peak: dict[str, dict] = {}                   # every contact during this interval, not just at its end:
+        while self.t + dt <= target + 1e-9:          # a fast flick touches an object for only a few milliseconds
             self.world.step()
+            for c in self.touches():
+                e = peak.get(c["id"])
+                if e is None or c["force"] > e["force"]:
+                    peak[c["id"]] = c
             if self.t >= self._next_rec:
                 hj = self.world.hand_last
                 self.record.append({"t": round(self.t, 4), "joints": None if hj is None else hj.round(4).tolist(),
                                     "poses": self.poses()})
                 self._next_rec += 1 / 60
         self.wall0 = wall - self.t                  # if capped, time slows instead of jumping
-        return {"t": round(self.t, 4), "poses": self.poses(), "touch": self.touches()}
+        return {"t": round(self.t, 4), "poses": self.poses(), "touch": list(peak.values())}
 
     def intervention_params(self) -> dict:
         """The session as a replayable 'hand' intervention."""
