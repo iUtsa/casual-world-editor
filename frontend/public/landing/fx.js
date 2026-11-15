@@ -1,4 +1,4 @@
-/* Causal World Editor landing: motion and interaction layer. No dependencies.
+/* Casual World Editor landing: motion and interaction layer. No dependencies.
    - scroll reveal, count-up stats, nav progress + active section, hero tilt, page wipe into the lab
    - 🖐 Touch toy: a small 2D rigid-body sim where the pointer is a kinematic hand
    - walk-around scan animation: phone circles the desk, cameras + points appear, objects are carved */
