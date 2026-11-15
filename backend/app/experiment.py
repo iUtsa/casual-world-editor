@@ -95,7 +95,8 @@ VERB_PATTERNS = [   # (canonical, regex) - checked in order; first match per cla
     ("collide", r"\b(collid\w*|clash\w*|crash(?:es|ing)? into each other|smash(?:es|ing)? into each other|hit each other|bump(?:s|ing)? into each other|head[- ]on|crash(?:es)?|collision)\b"),
     ("race", r"\b(race|racing)\b"),
     ("chase", r"\b(chas\w*|hunt\w*|run(?:s|ning)? after|follow\w*)\b"),
-    ("throw", r"\b(throw\w*|threw|toss\w*|launch\w*|shoot\w*|fire[sd]?|hurl\w*|chuck\w*|fling\w*|lob\w*|kick\w*|pitch\w*)\b"),
+    ("throw", r"\b(throw\w*|threw|toss\w*|launch\w*|shoot\w*|fire[sd]?|hurl\w*|chuck\w*|fling\w*|lob\w*|kick\w*|pitch\w*)\b"
+              r"|^\s*(?:through|thru|trow|throught)\b"),   # common misspellings, only as the command's first word
     ("drop", r"\b(drop\w*|fall\w*|fell|let .{0,30}fall|release[sd]?)\b"),
     ("bounce", r"\b(bounc\w*)\b"),
     ("pull", r"\b(pull\w*|tow\w*|drag\w*|haul\w*|tug\w*)\b"),
