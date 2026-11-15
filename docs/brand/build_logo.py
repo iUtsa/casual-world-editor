@@ -27,16 +27,29 @@ MARK_T = "translate(0.64 -19.3)"
 MARK_BOX = (50, 128, 413, 257)          # x, y, w, h of the mark alone (strokes included), in icon units
 
 
-def mark(stroke, ball, ball_outline=None, opacity=0.92):
+BALL_C = (377.15, 323.95)                # centre of the ball at rest, in mark units
+# the same throw as the landing page logo: the ball rides the dashed arc, then drops onto its resting spot
+FLY = dict(begin="0.4s", dur="1.15s", spline="0.35 0 0.55 1")
+
+
+def mark(stroke, ball, ball_outline=None, opacity=0.92, animate=False):
     o = f' stroke="{ball_outline}" stroke-width="9" paint-order="stroke"' if ball_outline else ""
+    if animate:   # SMIL, so it plays inside an <img> (README) with no script; hidden until the throw starts
+        cx, cy = BALL_C
+        ball_el = (f'<g opacity="0"><set attributeName="opacity" to="1" begin="{FLY["begin"]}" fill="freeze"/><g>'
+                   f'<path d="{P["ball"]}" transform="translate({-cx} {-cy})" fill="{ball}"{o}/>'
+                   f'<animateMotion begin="{FLY["begin"]}" dur="{FLY["dur"]}" fill="freeze" calcMode="spline" keyPoints="0;1" '
+                   f'keyTimes="0;1" keySplines="{FLY["spline"]}" path="{P["throw"]} Q350 314 {cx} {cy}"/></g></g>')
+    else:
+        ball_el = f'<path d="{P["ball"]}" fill="{ball}"{o}/>'
     return (f'<g transform="{MARK_T}">'
             f'<path d="{P["ground"]}" fill="none" stroke="{stroke}" stroke-width="24.7" stroke-linecap="round" stroke-linejoin="round"/>'
             f'<path d="{P["throw"]}" fill="none" stroke="{stroke}" stroke-opacity="{opacity}" stroke-width="20.9" stroke-linecap="round" stroke-dasharray="23.43 26.19"/>'
-            f'<path d="{P["ball"]}" fill="{ball}"{o}/></g>')
+            f'{ball_el}</g>')
 
 
-def tile(bg, stroke, ball, outline=None):
-    return f'<rect width="512" height="512" rx="116" fill="{bg}"/>' + mark(stroke, ball, outline)
+def tile(bg, stroke, ball, outline=None, animate=False):
+    return f'<rect width="512" height="512" rx="116" fill="{bg}"/>' + mark(stroke, ball, outline, animate=animate)
 
 
 # ---- outlined text
@@ -87,6 +100,7 @@ def main(font_path):
 
     # 1. app icons (tile)
     files["cwe-icon"] = write("cwe-icon.svg", svg(512, 512, tile(INK, CREAM, LIME), "Casual World Editor app icon"))
+    write("cwe-icon-animated.svg", svg(512, 512, tile(INK, CREAM, LIME, animate=True), "Casual World Editor app icon, animated"))
     files["cwe-icon-light"] = write("cwe-icon-light.svg", svg(512, 512, tile(CREAM, INK, LIME, INK), "Casual World Editor app icon, light"))
     files["cwe-icon-lime"] = write("cwe-icon-lime.svg", svg(512, 512, tile(LIME, INK, CREAM, INK), "Casual World Editor app icon, lime"))
 
@@ -107,6 +121,9 @@ def main(font_path):
         d, tw = text_path(bold, NAME, size, x0=S + gap, baseline=base, tracking=-0.02)
         W = S + gap + tw + 8
         files[f"cwe-logo-horizontal{theme}"] = write(f"cwe-logo-horizontal{theme}.svg", svg(W, S, ico + f'<path d="{d}" fill="{txt}"/>', f"Casual World Editor logo{theme.replace('-', ' ')}"))
+        # animated twin (README header): the ball is thrown along the arc when the image loads
+        ico_a = tile(INK, CREAM, LIME, animate=True) if theme == "" else tile(CREAM, INK, LIME, INK, animate=True)
+        write(f"cwe-logo-horizontal{theme}-animated.svg", svg(W, S, ico_a + f'<path d="{d}" fill="{txt}"/>', f"Casual World Editor logo, animated{theme.replace('-', ' ')}"))
         # stacked: icon over two-line wordmark
         ls = 190
         d1, w1 = text_path(bold, "Casual World", ls, tracking=-0.02); d2, w2 = text_path(bold, "Editor", ls, tracking=-0.02)
