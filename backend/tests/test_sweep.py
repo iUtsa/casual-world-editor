@@ -113,3 +113,44 @@ def test_live_hand_session_replays_identically():
     replay = np.array(sim["frames"][-1][i][:3])
     assert live[0] > 0.1                                  # it really was pushed
     assert np.linalg.norm(live - replay) < 0.01           # replay lands within 1 cm of the live result
+
+
+def test_ws_hand_live_session_commits_replayable_intervention():
+    """End to end over the WebSocket: a hand sweeps through a scanned object live, the session ends, and the
+    official simulation (a replay of the recorded 'hand' intervention) puts it where the live session did."""
+    import cv2
+    from fastapi.testclient import TestClient
+    from backend.app import synth
+    from backend.app.main import SESSION, app
+    from backend.app.perception import pipeline
+    info = synth.render("bridge")
+    rgb = cv2.cvtColor(cv2.imread(info["rgb"]), cv2.COLOR_BGR2RGB)
+    depth = np.load(str(info["rgb"]).replace("rgb.png", "depth_gt.npy"))
+    st = pipeline.scan(rgb, info["hfov_deg"], "synthetic:bridge", use_claude=False, depth_override=depth, label=False)
+    with SESSION.lock:
+        SESSION.perception = st
+        SESSION.interventions.clear(); SESSION.redo_stack.clear(); SESSION.invalidate(); SESSION.sim = None
+    o = min(st.scene.objects, key=lambda x: x.pos[0])           # the left-most object (the lone block)
+    x0, y0 = o.pos[0] - max(o.size[:2]) / 2 - 0.08, o.pos[1]
+    c = TestClient(app)
+    live_end = None
+    with c.websocket_connect("/ws/hand") as ws:
+        t = 0.0
+        while t < 1.3:
+            x = x0 + 0.35 * min(t, 0.9)
+            ws.send_json({"joints": _flat_hand(x, y0, 0.015).tolist(), "t": t})
+            out = ws.receive_json()
+            t += 1 / 30
+        for _ in range(45):
+            ws.send_json({"joints": None, "t": t})
+            out = ws.receive_json()
+            t += 1 / 30
+        live_end = np.array(out["poses"][o.id][:3])
+        assert o.id in out["moved"]
+        ws.send_json({"end": True})
+        done = ws.receive_json()["done"]
+    assert SESSION.interventions[-1].type == "hand"
+    i = done["object_ids"].index(o.id)
+    replay_end = np.array(done["frames"][-1][i][:3])
+    assert live_end[0] - o.pos[0] > 0.03                      # pushed to the right
+    assert np.linalg.norm(replay_end - live_end) < 0.02        # the official replay agrees with what was seen live
