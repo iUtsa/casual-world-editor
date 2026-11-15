@@ -1,4 +1,4 @@
-/* Causal World Editor landing page. No dependencies. */
+/* Casual World Editor landing page. No dependencies. */
 (() => {
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
