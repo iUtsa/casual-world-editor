@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { clock } from "../clock";
-import { applyCaptureCamera, geometryFor, observedMatrix, poseAt } from "../poses";
+import { LIVE, applyCaptureCamera, geometryFor, observedMatrix, onLive, poseAt } from "../poses";
 import { useScanned } from "../scanned";
 import type { Asset, Scene, SceneObject, Sim } from "../types";
 import Spawned from "./Spawned";
@@ -135,10 +135,12 @@ function World({ scene, sim, frameUrl, idsUrl, selected, showFit, showGhosts, as
   const frameTex = useTex(frameUrl, false);
   const idTex = useTex(idsUrl, true);
   const { camera } = useThree();
+  const [liveV, setLiveV] = useState(LIVE.version);
+  useEffect(() => onLive(() => setLiveV(LIVE.version)), []);
   const dynamic = useMemo(() => {
     if (!sim) return new Set<string>();
-    return new Set([...sim.moved_ids, ...Object.keys(sim.removed_at)]);
-  }, [sim]);
+    return new Set([...sim.moved_ids, ...Object.keys(sim.removed_at), ...(LIVE.active ? LIVE.moved : [])]);
+  }, [sim, liveV]);
   const meshes = useRef<Record<string, THREE.Mesh | null>>({});
   const fits = useRef<Record<string, THREE.LineSegments | null>>({});
   const objIndex = useMemo(() => {
