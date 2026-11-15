@@ -16,7 +16,7 @@ from typing import Literal, Optional
 
 import cv2
 import numpy as np
-from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -900,6 +900,83 @@ def _live_adopt(st):
 class LiveReq(BaseModel):
     hfov: float = 66.0
     enabled: Optional[bool] = None
+
+
+# ---------------------------------------------------------------- live physical hand (WebSocket)
+@app.websocket("/ws/hand")
+async def ws_hand(ws: WebSocket):
+    """The user's real hand as physics, live. Client -> {"joints": 21 x [x,y,z] world metres | null, "t": seconds on
+    the client's clock} about 30x a second, and {"end": true} when done. Server -> {"t", "poses": {id: [x,y,z,qw,qx,qy,qz]}, "touch": [...],
+    "moved": [...]}. The first reply also carries "sim" when there was none yet (so the page can render). On end, the
+    session becomes a replayable "hand" intervention and the official simulation is returned as {"done": sim}."""
+    from starlette.concurrency import run_in_threadpool
+    from .physics.hand import HandSession
+    await ws.accept()
+    st = SESSION.perception
+    if st is None or st.scene is None:
+        await ws.send_json({"error": "scan the table first"})
+        await ws.close()
+        return
+    session = None
+    hand_group = None
+    start_pose: dict = {}
+    first = True
+    try:
+        while True:
+            msg = await ws.receive_json()
+            if msg.get("end"):
+                break
+            joints = msg.get("joints")
+            if session is None:
+                if joints is None:
+                    await ws.send_json({"t": 0.0, "idle": True})     # always answer: the page keeps one message in flight
+                    continue
+                with SESSION.lock:
+                    if SESSION.sim is None:
+                        _run_sim()
+                    sim = SESSION.sim
+                    _checkpoint()
+                    # start exactly where the replay will start: the checkpoint's end state (the replay restores it
+                    # in the same step as the hand, see commit below), or the scan's own state when nothing ran yet
+                    if _ckpt_valid() and SESSION.ckpt:
+                        base, ivs, hand_group = SESSION.ckpt["qpos"], list(SESSION.ckpt["ivs"]), "restore"
+                    else:
+                        base, ivs, hand_group = None, list(SESSION.interventions), None
+                    removed = list((sim or {}).get("removed_at", {}).keys()) if base is not None else []
+                    g = next((float(i.params.get("g", 9.81)) for i in reversed(SESSION.interventions) if i.type == "set_gravity"), 9.81)
+                    session = await run_in_threadpool(HandSession, st.scene, joints, ivs,
+                                                      np.array(base) if base is not None else st.baseline_qpos, removed, g)
+                start_pose = {k: v[:3] for k, v in session.poses().items()}
+            # simulate on the client's clock (when the camera saw the hand), not on network arrival times
+            out = await run_in_threadpool(session.update, joints, float(msg["t"]) if "t" in msg else None)
+            out["moved"] = [k for k, v in out["poses"].items() if k in start_pose and float(np.linalg.norm(np.subtract(v[:3], start_pose[k]))) > 0.008]
+            if first:
+                out["sim"] = SESSION.sim
+                first = False
+            await ws.send_json(out)
+    except WebSocketDisconnect:
+        session_closed = True
+    else:
+        session_closed = False
+    if session is None or not session.updates:
+        return
+    # commit: the session becomes an ordinary, replayable intervention
+    try:
+        with SESSION.lock:
+            params = session.intervention_params()
+            if hand_group:
+                params["group"] = hand_group               # same step as the restore: no settling before the hand
+            SESSION.interventions.append(Intervention(type="hand", target=None, params=params))
+            SESSION.redo_stack.clear()
+            SESSION.invalidate()
+            sim = _run_sim()
+        if not session_closed:
+            await ws.send_json({"done": sim})
+            await ws.close()
+    except Exception as e:                       # never leave the page waiting
+        log.exception("hand session commit failed")
+        if not session_closed:
+            await ws.send_json({"error": str(e)})
 
 
 @app.post("/api/live/rescan")
