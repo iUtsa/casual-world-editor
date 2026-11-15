@@ -6,5 +6,5 @@ tunnel, so treat it as a demo, not a hardened service: run it only while you are
 
 ## Reporting a vulnerability
 
-Please open a [private security advisory](https://github.com/iUtsa/causal-world-editor/security/advisories/new) on
+Please open a [private security advisory](https://github.com/iUtsa/casual-world-editor/security/advisories/new) on
 GitHub instead of a public issue. Include steps to reproduce and the impact. We aim to reply within a week.
