@@ -1,4 +1,4 @@
-# Causal World Editor: Devpost, slides and video notes
+# Casual World Editor: Devpost, slides and video notes
 
 A running record of what we built, what we measured and what went wrong, kept as we work so the Devpost write-up,
 the slides and the demo video can be built from it. Numbers are measured on our M1 Mac (8 GB) unless noted.
