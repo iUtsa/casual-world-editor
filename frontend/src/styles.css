@@ -618,3 +618,12 @@ input[type="range"] { accent-color: var(--accent); }
 .chem-thermo p { flex-basis: 100%; margin: 0; }
 .warn-text { color: #fbbf24; }
 .chem-thermo .tile-big.main { border-color: #38bdf866; box-shadow: 0 0 30px -12px #38bdf8; }
+
+/* 🖐 Touch: live physical hand */
+.hand-skel.live line { stroke: #a7f3d0; filter: drop-shadow(0 0 5px #34d399); }
+.hand-skel.live circle { fill: #34d399; }
+.touch-mark circle { fill: #f59e0b33; stroke: #fbbf24; stroke-width: 2.5; filter: drop-shadow(0 0 10px #f59e0b);
+  animation: touch-pulse 0.6s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: center; }
+.touch-mark text { fill: #fde68a; font-weight: 700; paint-order: stroke; stroke: #070b16; stroke-width: 3px; }
+@keyframes touch-pulse { from { opacity: 0.65; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .touch-mark circle { animation: none; } }
