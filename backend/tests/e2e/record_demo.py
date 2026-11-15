@@ -1,25 +1,42 @@
-"""Record the landing-page demo video from the real app (Chromium, fake camera = the rendered 'bridge' test desk).
+"""Record the landing-page demo video from the real app (Chromium; the camera is the rendered "bridge" test desk).
 Landing -> Get started -> mapping -> inspect an object -> "drop a baseball on the red box" -> 3D twin -> 🖐 Touch.
-Writes OUT_DIR/raw.webm and OUT_DIR/marks.json (seconds into the recording where each part starts).
+Writes OUT_DIR/frames/ + frames.json (see screencast.py) and OUT_DIR/marks.json (seconds into the recording where each part starts).
 Usage: python backend/tests/e2e/record_demo.py OUT_DIR   (restart the server afterwards)"""
 import json
 import sys
 import time
 from pathlib import Path
 
-import cv2
 import numpy as np
 from playwright.sync_api import sync_playwright
 
+sys.path.insert(0, str(Path(__file__).parent))
+from screencast import Screencast  # noqa: E402
+
 out = Path(sys.argv[1]); out.mkdir(parents=True, exist_ok=True)
-img = cv2.resize(cv2.imread("data/synthetic/bridge/rgb.png"), (1280, 720))
-fake = out / "cam.y4m"
-yuv = cv2.cvtColor(img, cv2.COLOR_BGR2YUV_I420).tobytes()
-fake.write_bytes(b"YUV4MPEG2 W1280 H720 F30:1 Ip A1:1 C420jpeg\n" + b"".join(b"FRAME\n" + yuv for _ in range(30)))
-ARGS = ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--use-fake-device-for-media-stream",
-        "--use-fake-ui-for-media-stream", f"--use-file-for-fake-video-capture={fake}"]
+ARGS = ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader"]
 W, H = 1280, 720
 BASE = "http://localhost:8000"
+# The camera: the rendered 'bridge' test desk as a steady 30 fps stream. (Chrome's file-based fake camera stops
+# delivering frames while the Mac is busy mapping, which blanks the picture; a canvas stream doesn't.)
+FAKE_CAMERA = """(() => {
+  const real = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+  navigator.mediaDevices.getUserMedia = async (c) => {
+    if (!c || !c.video) return real(c);
+    const img = new Image(); img.src = '/api/synthetic/bridge'; await img.decode();
+    const cv = document.createElement('canvas'); cv.width = 1280; cv.height = 720;
+    // kept in the page (invisible) so Chrome keeps painting it while the screen is being captured
+    cv.style.cssText = 'position:fixed;left:0;top:0;width:2px;height:2px;opacity:0.01;pointer-events:none;z-index:-1';
+    document.body.appendChild(cv);
+    const ctx = cv.getContext('2d');
+    let k = 0;
+    const draw = () => { ctx.drawImage(img, 0, 0, 1280, 720); ctx.fillStyle = `rgba(0,0,0,${(k++ % 2) * 0.002})`; ctx.fillRect(0, 0, 1, 1); };
+    draw(); setInterval(draw, 33);
+    const stream = cv.captureStream(30);
+    await new Promise((r) => setTimeout(r, 800));   // real frames flowing before anyone grabs one
+    return stream;
+  };
+})()"""
 
 CAPTION = """(t) => {
   let el = document.getElementById('__cap');
@@ -54,25 +71,25 @@ def to_landmarks(Jw, cam):
 marks = {}
 with sync_playwright() as p:
     b = p.chromium.launch(args=ARGS)
-    ctx = b.new_context(viewport={"width": W, "height": H}, permissions=["camera"],
-                        record_video_dir=str(out), record_video_size={"width": W, "height": H})
+    ctx = b.new_context(viewport={"width": W, "height": H}, permissions=["camera"])
+    ctx.add_init_script(FAKE_CAMERA)
     pg = ctx.new_page()
-    t0 = time.time()
-    mark = lambda k: marks.__setitem__(k, round(time.time() - t0, 2))
+    rec = Screencast(ctx, pg, out, (W, H))
+    mark = lambda k: marks.__setitem__(k, time.time())
     cap = lambda t: pg.evaluate(CAPTION, t)
     errs = []; pg.on("pageerror", lambda e: errs.append(str(e)))
 
     # 1. landing
-    pg.goto(BASE + "/", wait_until="networkidle"); mark("landing")
+    pg.goto(BASE + "/"); pg.wait_for_selector(".hero h1"); mark("landing")
     pg.wait_for_timeout(3500)
     pg.mouse.move(900, 300); pg.wait_for_timeout(600)
     pg.locator(".hero .hero-actions a[data-start]").click()
     pg.wait_for_url("**/lab/"); mark("lab")
 
     # 2. mapping
-    pg.wait_for_selector(".map-progress", timeout=60000); mark("map")
+    pg.wait_for_selector(".map-progress", timeout=180000); mark("map")
     cap("Point a camera at a desk: it maps every object (sped up · camera = rendered test desk)")
-    pg.wait_for_selector(".map-progress", state="detached", timeout=300000); mark("mapped")
+    pg.wait_for_selector(".map-progress", state="detached", timeout=900000); mark("mapped")
     cap("Size, mass, friction and what rests on what, for every object")
     pg.wait_for_timeout(3000)
     sc = pg.evaluate("fetch('/api/scene').then(r => r.json())")["scene"]
@@ -134,8 +151,8 @@ with sync_playwright() as p:
         print("no touch report:", e)
     mark("touch_done")
     pg.wait_for_timeout(4000); cap(""); pg.wait_for_timeout(800); mark("end")
-    video = pg.video.path()
+    t0 = rec.stop()
     ctx.close(); b.close()
-    Path(video).rename(out / "raw.webm")
+marks = {k: round(v - t0, 2) for k, v in marks.items()}
 (out / "marks.json").write_text(json.dumps(marks, indent=1))
 print(json.dumps(marks), "errors:", errs)
