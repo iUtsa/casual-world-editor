@@ -1,12 +1,683 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Causal World Editor</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Causal World Editor</title>
+  <meta name="description" content="Point a camera at your desk, ask “what if?”, and watch a checked physics simulation play out on the real scene. Free and on-device." />
+  <meta property="og:title" content="Causal World Editor: stop imagining, start simulating" />
+  <meta property="og:description" content="Turn your desk or a textbook diagram into a physics world. Ask what if. Every result is checked against textbook theory. Runs entirely on your laptop." />
+  <link rel="icon" href="/landing/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/landing/styles.css" />
+  <link rel="stylesheet" href="/landing/fx.css" />
+  <script>document.documentElement.classList.add("js")</script>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap nav-inner">
+    <a class="brand" href="#top" aria-label="Causal World Editor home">
+      <svg class="mark" viewBox="0 0 32 32" aria-hidden="true"><rect x="1" y="1" width="30" height="30" rx="7" fill="#141414"/><path d="M5 25 L27 25 L5 12 Z" fill="none" stroke="#f6f4ee" stroke-width="1.8" stroke-linejoin="round"/><rect x="11.2" y="11.4" width="6" height="6" rx="1" transform="rotate(30.6 14.2 14.4)" fill="#ff5a1f"/><path d="M20 8 q4 1 6 6" fill="none" stroke="#ffd23f" stroke-width="1.8" stroke-dasharray="1.6 2.2" stroke-linecap="round"/></svg>
+      <span>Causal World Editor</span>
+    </a>
+    <nav class="nav-links" aria-label="Sections">
+      <a href="#try">Try it</a>
+      <a href="#touch">Touch</a>
+      <a href="#labs">Labs</a>
+      <a href="#how">How it works</a>
+      <a href="#accuracy">Accuracy</a>
+      <a href="#start">Quick start</a>
+    </nav>
+    <a class="nav-gh" href="https://github.com/iUtsa/causal-world-editor" target="_blank" rel="noopener" aria-label="Code on GitHub">
+      <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38v-1.33c-2.23.48-2.7-1.07-2.7-1.07-.36-.92-.89-1.17-.89-1.17-.73-.5.06-.49.06-.49.8.06 1.23.83 1.23.83.72 1.22 1.88.87 2.34.66.07-.52.28-.87.5-1.07-1.78-.2-3.65-.89-3.65-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.66 3.95.29.25.54.73.54 1.48v2.2c0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+    </a>
+    <a class="btn btn-orange nav-cta" href="/lab/" data-start>Get started <span class="arr" aria-hidden="true">→</span></a>
+  </div>
+  <div class="nav-progress" aria-hidden="true"><span></span></div>
+</header>
+
+<main id="top">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <p class="kicker">A physics lab for the thing in front of you</p>
+        <h1 class="split"><span class="w">Stop</span> <span class="w">imagining.</span><br><span class="hl"><span class="w">Start</span> <span class="w">simulating.</span></span></h1>
+        <p class="lede">Point a camera at your desk, or snap a photo of a textbook diagram. Causal World Editor builds a 3D physics world from what it sees and lets you ask <em>“what if?”</em> Every result is simulated, measured and <strong>checked against textbook theory</strong>.</p>
+        <div class="hero-actions">
+          <a class="btn btn-orange btn-lg" href="/lab/" data-start>Get started <span class="arr" aria-hidden="true">→</span></a>
+          <a class="btn btn-paper btn-lg" href="#try">Try the ramp demo</a>
+        </div>
+        <ul class="facts">
+          <li><b>Free</b> and open source</li>
+          <li><b>On-device</b>, no API keys needed</li>
+          <li>Built on an <b>M1 with 8 GB</b></li>
+        </ul>
+      </div>
+
+      <figure class="panel desk-panel" id="desk">
+        <div class="panel-bar">
+          <span class="bar-title">Live AR</span>
+          <span class="bar-meta" id="deskStatus">scanned · 4 objects · table plane found</span>
+        </div>
+        <div class="desk-stage">
+          <svg id="deskSvg" viewBox="0 0 640 420" role="img" aria-label="Illustration of a desk scan: a book with a mug on it, a bottle and a lemon, each outlined and labelled with size, mass and friction.">
+            <defs>
+              <pattern id="wood" width="60" height="14" patternUnits="userSpaceOnUse"><rect width="60" height="14" fill="#d9b382"/><path d="M0 7 q15 -4 30 0 t30 0" fill="none" stroke="#c99d68" stroke-width="1.2"/></pattern>
+              <pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#141414" stroke-width="1" opacity=".25"/></pattern>
+            </defs>
+            <!-- wall + desk -->
+            <rect width="640" height="420" fill="#ebe5d8"/>
+            <rect x="0" y="0" width="640" height="150" fill="#e4ddcd"/>
+            <polygon points="20,170 620,170 640,420 0,420" fill="url(#wood)" stroke="#141414" stroke-width="2"/>
+            <polygon id="planeFit" points="20,170 620,170 640,420 0,420" fill="#2f5bff" fill-opacity=".07" stroke="#2f5bff" stroke-width="1.5" stroke-dasharray="6 5"/>
+            <text class="svg-tag blue" x="30" y="408">table plane · RANSAC fit</text>
+
+            <!-- book -->
+            <g id="book">
+              <polygon points="120,282 330,282 350,318 104,318" fill="#2f5bff" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+              <polygon points="104,318 350,318 350,332 104,332" fill="#f6f4ee" stroke="#141414" stroke-width="2"/>
+              <line x1="108" y1="323" x2="346" y2="323" stroke="#141414" stroke-width=".8" opacity=".5"/>
+              <line x1="108" y1="327" x2="346" y2="327" stroke="#141414" stroke-width=".8" opacity=".5"/>
+            </g>
+            <!-- mug sits on book -->
+            <g id="mug">
+              <path d="M196 220 L196 290 Q228 302 260 290 L260 220 Z" fill="#ff5a1f" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+              <ellipse cx="228" cy="220" rx="32" ry="9" fill="#ff8a5c" stroke="#141414" stroke-width="2"/>
+              <path d="M260 234 q24 4 18 26 q-4 12 -18 12" fill="none" stroke="#141414" stroke-width="7"/>
+              <path d="M260 234 q24 4 18 26 q-4 12 -18 12" fill="none" stroke="#ff5a1f" stroke-width="3.5"/>
+            </g>
+            <!-- bottle -->
+            <g id="bottleGhost" opacity="0">
+              <path d="M470 312 L470 196 Q470 180 482 172 L482 146 L500 146 L500 172 Q512 180 512 196 L512 312 Z" fill="none" stroke="#141414" stroke-width="1.5" stroke-dasharray="5 4"/>
+              <text class="svg-tag" x="528" y="196">real bottle</text>
+              <text class="svg-tag" x="528" y="211">stays put</text>
+            </g>
+            <g id="bottle">
+              <path d="M470 312 L470 196 Q470 180 482 172 L482 146 L500 146 L500 172 Q512 180 512 196 L512 312 Z" fill="#7fd1a4" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+              <rect x="480" y="136" width="22" height="12" rx="2" fill="#141414"/>
+              <rect x="470" y="230" width="42" height="40" fill="#f6f4ee" stroke="#141414" stroke-width="1.5"/>
+            </g>
+            <!-- lemon -->
+            <g id="lemon">
+              <ellipse cx="410" cy="356" rx="28" ry="20" fill="#ffd23f" stroke="#141414" stroke-width="2"/>
+              <path d="M436 352 q8 2 8 6" fill="none" stroke="#141414" stroke-width="2"/>
+            </g>
+
+            <!-- masks + labels -->
+            <g id="masks">
+              <rect x="96" y="276" width="262" height="62" rx="6" class="mask blue"/>
+              <rect x="188" y="206" width="98" height="96" rx="8" class="mask orange"/>
+              <rect x="462" y="128" width="58" height="190" rx="8" class="mask green"/>
+              <rect x="376" y="330" width="74" height="52" rx="8" class="mask yellow"/>
+            </g>
+            <g id="labels">
+              <g transform="translate(8 192)"><rect width="142" height="40" rx="6" class="tag-bg"/><text class="svg-tag" x="10" y="17">mug · 9.6 cm · 0.31 kg</text><text class="svg-tag muted" x="10" y="32">μ 0.45 · on book</text></g>
+              <g transform="translate(112 346)"><rect width="150" height="40" rx="6" class="tag-bg"/><text class="svg-tag" x="10" y="17" id="bookMass">book · 2.4 cm · 0.62 kg</text><text class="svg-tag muted" x="10" y="32">μ 0.38 · on table</text></g>
+              <g transform="translate(330 70)" id="bottleTag"><rect width="100" height="40" rx="6" class="tag-bg"/><text class="svg-tag" x="10" y="17">bottle · 24 cm</text><text class="svg-tag muted" x="10" y="32">0.52 kg · μ 0.30</text></g>
+              <g transform="translate(470 360)"><rect width="104" height="40" rx="6" class="tag-bg"/><text class="svg-tag" x="10" y="17">lemon · 7 cm</text><text class="svg-tag muted" x="10" y="32">0.12 kg · μ 0.50</text></g>
+            </g>
+            <!-- gravity readout -->
+            <g transform="translate(520 16)"><rect width="104" height="26" rx="6" class="tag-bg"/><text class="svg-tag" x="10" y="17" id="gReadout">g = 9.81 m/s²</text></g>
+            <!-- push arrow -->
+            <g id="pushArrow" opacity="0">
+              <line x1="404" y1="214" x2="456" y2="214" stroke="#ff5a1f" stroke-width="5" stroke-linecap="round"/>
+              <path d="M452 204 L468 214 L452 224 Z" fill="#ff5a1f"/>
+            </g>
+            <!-- baseball -->
+            <g id="ball" opacity="0">
+              <circle cx="0" cy="0" r="13" fill="#fffdf8" stroke="#141414" stroke-width="2"/>
+              <path d="M-7 -10 q5 10 0 20 M7 -10 q-5 10 0 20" fill="none" stroke="#ff5a1f" stroke-width="1.5"/>
+            </g>
+          </svg>
+          <div class="support" aria-label="Support graph">
+            <span class="support-title">Support graph</span>
+            <div class="support-tree">
+              <span class="node">table</span>
+              <span class="edges"><span class="node">book <i>→</i> <b>mug</b></span><span class="node">bottle</span><span class="node">lemon</span></span>
+            </div>
+          </div>
+        </div>
+        <div class="desk-ask">
+          <div class="ask-label">Say or type what you want. It acts on the scanned scene.</div>
+          <div class="chips" id="deskChips">
+            <button class="chip" data-act="knock">knock over the bottle</button>
+            <button class="chip" data-act="drop">drop a baseball on the book</button>
+            <button class="chip" data-act="heavy">what if the book was 10× heavier?</button>
+            <button class="chip" data-act="moon">moon gravity</button>
+            <button class="chip ghost" data-act="reset">undo all</button>
+          </div>
+          <p class="desk-answer" id="deskAnswer" aria-live="polite">Pick a question above. The scene re-simulates from its last settled state.</p>
+        </div>
+        <figcaption class="cap">Illustration of the Live AR view. In the app this sits on top of your real camera image.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- PROBLEM -->
+  <section class="section problem" id="why">
+    <div class="wrap two-col">
+      <div>
+        <h2>Textbooks show the first frame.<br>You have to imagine the rest.</h2>
+        <p>A block on a ramp. Two balls about to collide. A planet's orbit. Students stare at still diagrams and try to play the movie in their heads. Cognitive scientists call this <em>mental animation</em>, and it is hard, even for people who know the formulas.</p>
+        <p>Causal World Editor plays the movie for you, then lets you change the setup and play it again. Change the angle, swap the planet, make the table icy. You see what happens, and you see the number that proves it.</p>
+      </div>
+      <div class="panel textbook">
+        <div class="tb-fig">
+          <svg viewBox="0 0 360 220" aria-label="Static textbook figure: a 2 kg block on a 30 degree ramp with friction 0.2">
+            <rect width="360" height="220" fill="#fffdf8"/>
+            <path d="M30 190 L330 190 L30 17 Z" fill="url(#hatch)" stroke="#141414" stroke-width="2" stroke-linejoin="round"/>
+            <line x1="20" y1="190" x2="340" y2="190" stroke="#141414" stroke-width="2"/>
+            <g transform="translate(118 67.5) rotate(30)"><rect x="-22" y="-44" width="44" height="44" fill="#fffdf8" stroke="#141414" stroke-width="2"/><text x="0" y="-17" text-anchor="middle" class="tb-text">2 kg</text></g>
+            <path d="M282 190 A48 48 0 0 0 288.4 166" fill="none" stroke="#141414" stroke-width="1.5"/>
+            <text x="262" y="181" class="tb-text">30°</text>
+            <text x="158" y="72" class="tb-text">μ = 0.2</text>
+            <text x="30" y="212" class="tb-text muted">Fig. 4.12 Block on an inclined plane</text>
+          </svg>
+        </div>
+        <ul class="tb-questions">
+          <li>How long until it reaches the bottom?</li>
+          <li>Does a heavier block get there sooner?</li>
+          <li>What changes if the ramp is twice as steep?</li>
+          <li>Would it slide at all on the Moon?</li>
+        </ul>
+        <a class="tb-link" href="#try">Run this exact figure below →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- THREE WAYS -->
+  <section class="section ways">
+    <div class="wrap">
+      <h2 class="center">Four ways to ask “what if?”</h2>
+      <div class="ways-grid">
+        <article class="panel way">
+          <svg class="way-icon" viewBox="0 0 48 48" aria-hidden="true"><rect x="4" y="12" width="40" height="28" rx="5" fill="#ffd23f" stroke="#141414" stroke-width="2.5"/><circle cx="24" cy="26" r="8" fill="#fffdf8" stroke="#141414" stroke-width="2.5"/><rect x="16" y="7" width="14" height="6" rx="2" fill="#141414"/></svg>
+          <h3>Scan your desk</h3>
+          <p>Use the laptop webcam or your phone. Every object is lifted into 3D with size, mass, friction and what it rests on. Orbit a photo-textured digital twin, click anything to inspect it, then push it, throw at it or change gravity.</p>
+          <p class="way-ex">“throw a baseball at the mug”</p>
+        </article>
+        <article class="panel way">
+          <svg class="way-icon" viewBox="0 0 48 48" aria-hidden="true"><rect x="6" y="6" width="36" height="36" rx="4" fill="#fffdf8" stroke="#141414" stroke-width="2.5"/><path d="M11 36 L37 36 L11 18 Z" fill="none" stroke="#2f5bff" stroke-width="2.5" stroke-linejoin="round"/><rect x="15" y="18" width="7" height="7" transform="rotate(34 18.5 21.5)" fill="#ff5a1f" stroke="#141414" stroke-width="1.5"/></svg>
+          <h3>Snap a diagram</h3>
+          <p>Photograph a textbook page or a whiteboard. A local vision model reads it and shows you an editable reading card, so you can fix anything it got wrong before the simulation runs.</p>
+          <p class="way-ex">“what if the angle was 60°?”</p>
+        </article>
+        <article class="panel way">
+          <svg class="way-icon" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="6" fill="#ff5a1f" stroke="#141414" stroke-width="2.5"/><ellipse cx="24" cy="24" rx="19" ry="9" fill="none" stroke="#141414" stroke-width="2.5" transform="rotate(-20 24 24)"/><circle cx="41" cy="18" r="3.5" fill="#2f5bff" stroke="#141414" stroke-width="2"/></svg>
+          <h3>Ask the Studio</h3>
+          <p>Type an experiment in plain English. Collide whales, swap Jupiter for the Moon, wire an RC circuit, burn methane or watch GPT-2 think. Each lab uses a real solver, not an animation.</p>
+          <p class="way-ex">“what if there was no Sun?”</p>
+        </article>
+        <article class="panel way">
+          <svg class="way-icon" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="21" fill="#2f5bff" stroke="#141414" stroke-width="2.5"/><path d="M18 36 C14 31 13 26 15.5 22.5 L18 20 C19 19 20.5 19.5 20.5 21 L20.5 25 L21.5 14 C21.5 12 24.5 12 24.5 14 L24.5 23.5 L25.5 12.5 C25.5 10.5 28.5 10.5 28.5 12.5 L28.5 23.5 L30 15.5 C30 13.5 33 13.8 32.8 15.8 L31.5 27 C31 32 28.5 36 24 37 Z" fill="#fffdf8" stroke="#141414" stroke-width="2" stroke-linejoin="round"/></svg>
+          <h3>Use your hand</h3>
+          <p>Hold your hand up to the camera and push the digital twin with your real fingers. 21 tracked bones become physics, so you can push, tip and flick things live, then replay it exactly.</p>
+          <p class="way-ex">🖐 Touch: push the mug off the book</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRY IT -->
+  <section class="section try" id="try">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Try it: from a photo to a checked answer</h2>
+        <p>This is the diagram flow from the app, rebuilt as a small sketch that runs in your browser. The simulation below really integrates the motion step by step, measures it, and compares it with the textbook formula, just as the app does with MuJoCo.</p>
+      </div>
+
+      <div class="flow">
+        <div class="panel photo">
+          <div class="panel-bar"><span class="bar-title">1 · Your photo</span></div>
+          <svg viewBox="0 0 300 200" aria-label="Hand-drawn whiteboard diagram of a block on a ramp">
+            <rect width="300" height="200" fill="#fbfbf7"/>
+            <path d="M28 168 C90 167 170 169 272 166 M30 168 C29 120 31 70 32 34 M32 36 C100 80 190 128 270 166" fill="none" stroke="#2f5bff" stroke-width="3" stroke-linecap="round"/>
+            <path d="M92 70 l26 15 l-14 24 l-26 -15 z" fill="none" stroke="#141414" stroke-width="2.6" stroke-linejoin="round"/>
+            <text x="86" y="96" class="marker" transform="rotate(30 100 90)">2kg</text>
+            <path d="M232 166 C236 158 238 154 240 147" fill="none" stroke="#e5484d" stroke-width="2.4"/>
+            <text x="206" y="156" class="marker red">30°</text>
+            <text x="150" y="82" class="marker">μ=0.2</text>
+            <text x="98" y="190" class="marker">L = 1 m</text>
+          </svg>
+        </div>
+        <div class="flow-arrow" aria-hidden="true"><span>local vision model reads it</span><svg viewBox="0 0 60 20"><path d="M2 10 H54 M46 3 L56 10 L46 17" fill="none" stroke="#141414" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <form class="panel card" id="readingCard" autocomplete="off">
+          <div class="panel-bar"><span class="bar-title">2 · Reading card</span><span class="bar-meta">edit anything</span></div>
+          <div class="card-body">
+            <p class="card-read">“Inclined plane, 30°, 2 kg block, kinetic friction 0.2, ramp 1 m long.”</p>
+            <div class="fields">
+              <label>Angle <span class="unit">°</span><input type="number" name="angle" min="5" max="80" step="1" value="30"></label>
+              <label>Mass <span class="unit">kg</span><input type="number" name="mass" min="0.1" max="500" step="0.1" value="2"></label>
+              <label>Friction <span class="unit">μ</span><input type="number" name="mu" min="0" max="1.5" step="0.01" value="0.2"></label>
+              <label>Length <span class="unit">m</span><input type="number" name="length" min="0.2" max="5" step="0.1" value="1"></label>
+              <label>Gravity <span class="unit">m/s²</span><input type="number" name="g" min="0.5" max="30" step="0.01" value="9.81"></label>
+            </div>
+            <button class="btn btn-orange full" type="submit">Simulate this</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="sim-grid">
+        <div class="panel sim">
+          <div class="panel-bar">
+            <span class="bar-title">3 · Simulation</span>
+            <span class="bar-meta" id="simMeta">ready</span>
+            <label class="slow"><input type="checkbox" id="slowmo" checked> slow motion</label>
+          </div>
+          <div class="canvas-wrap"><canvas id="sim" aria-label="Animated simulation of the block sliding down the ramp, with a strobe trail and a speed chart"></canvas></div>
+          <form class="whatif" id="whatIf" autocomplete="off">
+            <input id="whatIfInput" type="text" placeholder="Ask a follow-up, e.g. what if the angle was 60°?" aria-label="What if question">
+            <button class="btn btn-ink" type="submit">Ask</button>
+          </form>
+          <div class="chips small" id="simChips">
+            <button class="chip" data-q="what if the angle was 60°?">angle 60°</button>
+            <button class="chip" data-q="what if it was 10× heavier?">10× heavier</button>
+            <button class="chip" data-q="make the ramp icy">icy ramp</button>
+            <button class="chip" data-q="moon gravity">moon gravity</button>
+            <button class="chip" data-q="make it rough like sandpaper">sandpaper</button>
+            <button class="chip ghost" data-q="reset">reset</button>
+          </div>
+        </div>
+        <aside class="panel check" aria-live="polite">
+          <div class="panel-bar"><span class="bar-title">4 · Theory check</span><span class="pill" id="checkPill">waiting</span></div>
+          <div class="check-body">
+            <p class="check-formula">a = g (sin θ − μ cos θ)</p>
+            <table class="check-table">
+              <thead><tr><th></th><th>measured</th><th>textbook</th></tr></thead>
+              <tbody>
+                <tr><td>time to bottom</td><td id="mT">–</td><td id="pT">–</td></tr>
+                <tr><td>final speed</td><td id="mV">–</td><td id="pV">–</td></tr>
+                <tr><td>energy left</td><td id="mE">–</td><td id="pE">–</td></tr>
+              </tbody>
+            </table>
+            <div class="agree"><span>Agreement</span><b id="agree">–</b></div>
+            <p class="insight" id="insight">Press <b>Simulate this</b> to run the figure as it was read.</p>
+            <ol class="history" id="history" aria-label="Run history"></ol>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- TOUCH -->
+  <section class="section touch" id="touch">
+    <div class="wrap touch-grid">
+      <div class="touch-copy">
+        <p class="eyebrow">New · 🖐 Touch</p>
+        <h2>Your hand <span class="hl">is</span> the physics.</h2>
+        <p>No gesture rules. MediaPipe finds 21 joints of your real hand, a linear solve puts them in 3D at true size, and each bone becomes a capsule in the simulation. Whatever your fingers touch gets pushed, tipped or flicked by the contact itself.</p>
+        <p>When your hand leaves, the session becomes an ordinary action you can undo, measure and replay, and the replay lands exactly where the live run did.</p>
+        <dl class="speeds touch-stats">
+          <div><dt>physics per hand update</dt><dd><span data-count="2.2" data-dec="1">2.2</span> ms</dd></div>
+          <div><dt>replay vs live</dt><dd><span data-count="0" data-dec="2">0.00</span> mm</dd></div>
+          <div><dt>bones simulated</dt><dd><span data-count="21">21</span></dd></div>
+        </dl>
+      </div>
+      <figure class="panel toy">
+        <div class="panel-bar">
+          <span class="bar-title">Try it with your cursor</span>
+          <span class="bar-meta" id="toyMeta">move over the table</span>
+          <button class="chip small-chip" id="toyReset" type="button">reset</button>
+        </div>
+        <div class="toy-stage"><canvas id="toy" aria-label="A small physics toy: move your pointer to push blocks and balls across a table; contact forces are shown in newtons."></canvas></div>
+        <figcaption class="cap">A 2D sketch of the idea that runs in your browser: your pointer is a kinematic hand and every push comes from a contact. In the lab it is your real hand and MuJoCo in 3D.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- WALK-AROUND SCAN -->
+  <section class="section sweep" id="scan">
+    <div class="wrap two-col">
+      <div class="panel orbit">
+        <svg viewBox="0 70 420 230" id="orbitSvg" aria-label="Animation: a phone circles a desk, its camera positions are solved, and objects are carved into 3D shapes.">
+          <rect y="70" width="420" height="230" fill="#fbf9f3"/>
+          <ellipse cx="210" cy="190" rx="170" ry="62" fill="none" stroke="#141414" stroke-opacity=".25" stroke-dasharray="4 5"/>
+          <polygon points="80,200 340,200 370,250 50,250" fill="url(#wood)" stroke="#141414" stroke-width="2"/>
+          <g class="ghosts" fill="none" stroke="#141414" stroke-opacity=".35" stroke-width="1.5" stroke-dasharray="4 4">
+            <rect x="120" y="170" width="70" height="30" rx="3"/><path d="M220 200 L220 140 Q240 132 260 140 L260 200 Z"/><ellipse cx="300" cy="190" rx="20" ry="14"/>
+          </g>
+          <g class="carve c1"><rect x="120" y="170" width="70" height="30" rx="3" fill="#2f5bff" stroke="#141414" stroke-width="2"/></g>
+          <g class="carve c2"><path d="M220 200 L220 140 Q240 132 260 140 L260 200 Z" fill="#ff5a1f" stroke="#141414" stroke-width="2"/></g>
+          <g class="carve c3"><ellipse cx="300" cy="190" rx="20" ry="14" fill="#ffd23f" stroke="#141414" stroke-width="2"/></g>
+          <g id="sfmPts" fill="#141414"></g>
+          <g id="orbitCams"></g>
+          <g id="orbitPhone">
+            <rect x="-11" y="-18" width="22" height="36" rx="5" fill="#ffd23f" stroke="#141414" stroke-width="2"/>
+            <circle cx="0" cy="-10" r="3" fill="#141414"/>
+          </g>
+          <text x="16" y="286" class="svg-tag muted" id="orbitStep">1 · walk around with your phone</text>
+        </svg>
+      </div>
+      <div>
+        <p class="eyebrow">Walk-around 3D scan</p>
+        <h2>Circle the desk once. Get real shapes back.</h2>
+        <p>Record a short video walking around the table. The app solves where the camera was in every frame from the video alone (our own structure-from-motion with bundle adjustment), finds what rises above the table by parallax, then carves each object into a textured mesh with its own mass.</p>
+        <ol class="steps-mini">
+          <li><span><b>Track</b> 56 keyframes, camera positions within ~1 cm</span></li>
+          <li><span><b>Find</b> objects by plane + parallax, outlined by SAM 2.1</span></li>
+          <li><span><b>Carve</b> label-consistent voxels into meshes and convex hulls</span></li>
+        </ol>
+        <p class="muted small">On our test desk: 5 of 6 objects found; surface error 7–11 mm; about 5 minutes on an 8 GB M1.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- LABS -->
+  <section class="section labs" id="labs">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Studio: every lab in one place</h2>
+        <p>Not just desks. Each lab is backed by the solver a scientist would reach for, and every result can be followed up with another “what if”.</p>
+      </div>
+      <div class="tabs" role="tablist" aria-label="Labs">
+        <button role="tab" aria-selected="true" aria-controls="lab-physics" id="t-physics">Physics</button>
+        <button role="tab" aria-selected="false" aria-controls="lab-space" id="t-space">Space</button>
+        <button role="tab" aria-selected="false" aria-controls="lab-circuits" id="t-circuits">Circuits</button>
+        <button role="tab" aria-selected="false" aria-controls="lab-chem" id="t-chem">Chemistry</button>
+        <button role="tab" aria-selected="false" aria-controls="lab-ai" id="t-ai">AI Lab</button>
+      </div>
+
+      <div class="panel lab" role="tabpanel" id="lab-physics" aria-labelledby="t-physics">
+        <div class="lab-text">
+          <h3>Rigid bodies at real-world scale</h3>
+          <ul class="asks"><li>“two blue whales collide at 10 m/s”</li><li>“a toy car pulls a truck”</li><li>“line up 10 dominoes and knock them over”</li></ul>
+          <p class="engine"><b>Under the hood</b> MuJoCo with real sizes and masses. Toys scale properly: mass ∝ k³, speed ∝ √k. Measurements come straight from simulator state at 60 Hz.</p>
+        </div>
+        <div class="lab-vis">
+          <svg viewBox="0 0 420 220" class="dominoes" aria-label="Animation of ten dominoes falling in sequence">
+            <line x1="10" y1="180" x2="410" y2="180" stroke="#141414" stroke-width="2"/>
+            <rect x="10" y="181" width="400" height="10" fill="url(#hatch)"/>
+            <g id="dominoRow"></g>
+            <circle class="pusher" cx="22" cy="172" r="8" fill="#ff5a1f" stroke="#141414" stroke-width="2"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="panel lab" role="tabpanel" id="lab-space" aria-labelledby="t-space" hidden>
+        <div class="lab-text">
+          <h3>Orbits with real ephemerides</h3>
+          <ul class="asks"><li>“what if Jupiter orbited Earth?”</li><li>“the Sun falls into a black hole”</li><li>“Milky Way and Andromeda collide”</li></ul>
+          <p class="engine"><b>Under the hood</b> REBOUND IAS15, conserving energy to about 1e-15, started from NASA JPL Horizons positions cached for offline use. Tidal disruption, gravitational-wave inspiral and merger physics included.</p>
+        </div>
+        <div class="lab-vis">
+          <svg viewBox="0 0 420 220" aria-label="Animation of two planets orbiting a star">
+            <rect width="420" height="220" fill="#141414" rx="6"/>
+            <g fill="#f6f4ee" opacity=".55"><circle cx="40" cy="30" r="1"/><circle cx="380" cy="50" r="1.2"/><circle cx="300" cy="190" r="1"/><circle cx="70" cy="170" r="1.3"/><circle cx="200" cy="20" r="1"/><circle cx="350" cy="140" r="1"/><circle cx="120" cy="100" r=".8"/></g>
+            <ellipse cx="210" cy="110" rx="70" ry="42" fill="none" stroke="#f6f4ee" stroke-opacity=".3" stroke-dasharray="3 4"/>
+            <ellipse cx="210" cy="110" rx="160" ry="88" fill="none" stroke="#f6f4ee" stroke-opacity=".3" stroke-dasharray="3 4"/>
+            <circle cx="210" cy="110" r="16" fill="#ffd23f"/>
+            <circle r="6" fill="#2f5bff" stroke="#f6f4ee" stroke-width="1.5"><animateMotion dur="4s" repeatCount="indefinite" path="M280 110 A70 42 0 1 1 140 110 A70 42 0 1 1 280 110"/></circle>
+            <circle r="11" fill="#ff5a1f" stroke="#f6f4ee" stroke-width="1.5"><animateMotion dur="11.3s" repeatCount="indefinite" path="M370 110 A160 88 0 1 1 50 110 A160 88 0 1 1 370 110"/></circle>
+            <text x="14" y="206" class="svg-tag light">Kepler check: T² ∝ a³</text>
+          </svg>
+        </div>
+      </div>
+
+      <div class="panel lab" role="tabpanel" id="lab-circuits" aria-labelledby="t-circuits" hidden>
+        <div class="lab-text">
+          <h3>Circuits solved like SPICE does</h3>
+          <ul class="asks"><li>“9 V battery with two bulbs in parallel”</li><li>“RC circuit with 100 µF and 1 kΩ”</li></ul>
+          <p class="engine"><b>Under the hood</b> Modified nodal analysis, the method SPICE uses, with transients. Kirchhoff's laws are checked on every result.</p>
+        </div>
+        <div class="lab-vis">
+          <svg viewBox="0 0 420 220" aria-label="RC circuit schematic and its charging curve with time constant 0.1 seconds">
+            <rect width="420" height="220" fill="#fffdf8"/>
+            <g fill="none" stroke="#141414" stroke-width="2.2" stroke-linejoin="round">
+              <path d="M30 60 H70 M110 60 H150 M150 60 V150 H30 V112 M30 98 V60"/>
+              <path d="M70 60 l5 -8 l10 16 l10 -16 l10 16 l5 -8"/>
+              <path d="M18 98 H42 M24 112 H36" stroke-width="3"/>
+              <path d="M138 100 H162 M138 108 H162" stroke-width="3"/>
+            </g>
+            <text x="78" y="44" class="svg-tag">1 kΩ</text><text x="166" y="108" class="svg-tag">100 µF</text><text x="46" y="110" class="svg-tag">9 V</text>
+            <g transform="translate(220 30)">
+              <line x1="0" y1="140" x2="180" y2="140" stroke="#141414" stroke-width="1.5"/>
+              <line x1="0" y1="0" x2="0" y2="140" stroke="#141414" stroke-width="1.5"/>
+              <line x1="0" y1="10" x2="180" y2="10" stroke="#2f5bff" stroke-dasharray="4 4" stroke-width="1.2"/>
+              <path class="rc-curve" d="M0 140 C 22 60, 50 26, 180 12" fill="none" stroke="#ff5a1f" stroke-width="3"/>
+              <line x1="36" y1="140" x2="36" y2="58" stroke="#141414" stroke-dasharray="2 3"/>
+              <text x="30" y="156" class="svg-tag">τ = RC = 0.1 s</text>
+              <text x="120" y="26" class="svg-tag blue">9 V</text>
+              <text x="44" y="70" class="svg-tag muted">63%</text>
+            </g>
+          </svg>
+        </div>
+      </div>
+
+      <div class="panel lab" role="tabpanel" id="lab-chem" aria-labelledby="t-chem" hidden>
+        <div class="lab-text">
+          <h3>Reactions with measured energies, quantum chemistry when there are none</h3>
+          <ul class="asks"><li>“burn methane”</li><li>“hydrogen and oxygen make water”</li></ul>
+          <p class="engine"><b>Under the hood</b> Exact balancing, measured NIST/CRC enthalpies, GFN2-xTB molecular dynamics, and DFT (M06-2X/def2-TZVP in PySCF) for molecules with no measured data, reported with an honest error bar.</p>
+        </div>
+        <div class="lab-vis chem">
+          <div class="eq"><span class="mol">CH₄</span><span class="op">+</span><span class="mol"><i>2</i>O₂</span><span class="op">→</span><span class="mol">CO₂</span><span class="op">+</span><span class="mol"><i>2</i>H₂O</span></div>
+          <table class="balance">
+            <thead><tr><th>atom</th><th>left</th><th>right</th><th></th></tr></thead>
+            <tbody>
+              <tr><td>C</td><td>1</td><td>1</td><td class="ok">balanced</td></tr>
+              <tr><td>H</td><td>4</td><td>4</td><td class="ok">balanced</td></tr>
+              <tr><td>O</td><td>4</td><td>4</td><td class="ok">balanced</td></tr>
+            </tbody>
+          </table>
+          <p class="dh">ΔH ≈ −802 kJ/mol <span>(gas-phase water, measured)</span></p>
+          <p class="dh-note">No measured value? DFT steps in and reports ± max(21.6 kJ/mol, 4.5% of |ΔH|).</p>
+        </div>
+      </div>
+
+      <div class="panel lab" role="tabpanel" id="lab-ai" aria-labelledby="t-ai" hidden>
+        <div class="lab-text">
+          <h3>Watch a language model make up its mind</h3>
+          <ul class="asks"><li>“the cat sat on the”</li></ul>
+          <p class="engine"><b>Under the hood</b> A real GPT-2 running on your machine. Inspect attention heads and use the logit lens to watch the next word form, layer by layer.</p>
+        </div>
+        <div class="lab-vis ai">
+          <p class="prompt-line">the cat sat on the <span class="blank">___</span></p>
+          <div class="layers" id="layers" aria-label="Illustration of the top guess sharpening across 12 layers"></div>
+          <p class="cap left">Illustration. In the app these are the real per-layer values from GPT-2.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="section how" id="how">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>How it works</h2>
+        <p>A camera frame becomes a world model, the world model becomes a simulation, and the simulation is measured and checked before anything reaches the screen.</p>
+      </div>
+      <div class="pipe">
+        <div class="stage-card"><h3>See</h3><p class="stage-sub">camera, phone or diagram photo</p><ul><li>Depth Anything V2 for metric depth</li><li>Walk-around video: camera solve + carving</li><li>SAM 2.1 masks, prompted from geometry</li><li>RANSAC table plane and 3D lifting</li><li>Local VLM for labels and diagrams</li><li>Whisper for voice</li></ul></div>
+        <div class="pipe-link" aria-hidden="true"></div>
+        <div class="stage-card"><h3>Understand</h3><p class="stage-sub">the world model</p><ul><li>Objects with size, mass and friction</li><li>Support graph: what holds up what</li><li>Real-size library, plausibility-checked density</li><li>Interventions with undo</li></ul></div>
+        <div class="pipe-link" aria-hidden="true"></div>
+        <div class="stage-card"><h3>Simulate</h3><p class="stage-sub">the right solver for the job</p><ul><li>MuJoCo for desks and bodies</li><li>REBOUND for space</li><li>Modified nodal analysis for circuits</li><li>xTB and DFT for chemistry</li></ul></div>
+        <div class="pipe-link" aria-hidden="true"></div>
+        <div class="stage-card accent"><h3>Check</h3><p class="stage-sub">measurement and theory</p><ul><li>60 Hz state: speed, forces, energy</li><li>Textbook formula beside each measured value</li><li>Says so when a formula doesn't apply</li></ul></div>
+        <div class="pipe-link" aria-hidden="true"></div>
+        <div class="stage-card"><h3>Show</h3><p class="stage-sub">on top of the real scene</p><ul><li>Live AR overlay</li><li>Photo-textured 3D twin</li><li>Charts and a plain-language explanation</li><li>Live hand contacts in newtons</li></ul></div>
+      </div>
+
+      <div class="how-more">
+        <div class="panel hand">
+          <svg viewBox="0 0 120 120" aria-hidden="true" class="hand-svg">
+            <circle cx="60" cy="60" r="56" fill="#ffd23f" stroke="#141414" stroke-width="2.5"/>
+            <path d="M44 86 C36 74 34 62 40 54 L46 48 C48 46 52 47 52 50 L52 60 L54 34 C54 30 60 30 60 34 L60 56 L62 30 C62 26 68 26 68 30 L68 56 L71 36 C71 32 77 32 77 36 L76 60 L80 46 C81 42 87 43 86 47 L82 70 C80 80 74 88 64 90 Z" fill="#fffdf8" stroke="#141414" stroke-width="2.5" stroke-linejoin="round"/>
+          </svg>
+          <div>
+            <h3>Hand control, without the mess</h3>
+            <p>MediaPipe tracks your hand in the browser at about 13 ms per frame. Pinch to grab and throw, swipe to push, or switch on <b>🖐 Touch</b> and push with your fingers directly. Your hand moves the object's digital twin, not the real one, so you can knock the mug over without spilling your coffee.</p>
+          </div>
+        </div>
+        <div class="panel checkpoint">
+          <h3>Each action picks up where the last one settled</h3>
+          <p>The scene is checkpointed after every action, so “now drop a ball on it” continues from the settled result instead of replaying the whole history. That takes 0.4 to 1.3 s per action.</p>
+          <ol class="timeline"><li>scan</li><li>knock over the bottle</li><li>moon gravity</li><li>drop a baseball on the book</li></ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ACCURACY -->
+  <section class="section accuracy" id="accuracy">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Every answer is checked</h2>
+        <p>Results come with the measured value next to the textbook prediction and the agreement between them. The tests check physics, not just code paths: a resting contact force must equal the object's weight, and energy given to a passive object must equal the energy the other one gave up.</p>
+      </div>
+      <div class="stats">
+        <div class="stat"><b><span data-count="99.89" data-dec="2">99.89</span>%</b><span>mean theory-check agreement across the experiment battery</span></div>
+        <div class="stat"><b><span data-count="99.55" data-dec="2">99.55</span>%</b><span>worst case in the same battery</span></div>
+        <div class="stat"><b><span data-count="151">151</span></b><span>tests passing, plus one expected failure</span></div>
+        <div class="stat"><b><span data-count="21.6" data-dec="1">21.6</span></b><span>kJ/mol mean absolute error for DFT on 10 measured reactions</span></div>
+      </div>
+      <div class="laws">
+        <span class="law">conservation of energy</span><span class="law">conservation of momentum</span><span class="law">ballistic range</span><span class="law">Kepler's laws</span><span class="law">tidal radius</span><span class="law">debris fall-back time</span><span class="law">gravitational-wave chirp</span><span class="law">Kirchhoff's laws</span>
+      </div>
+      <div class="panel honest">
+        <div>
+          <h3>When the textbook doesn't apply, it says so</h3>
+          <p>A star torn apart by a black hole with a small mass ratio is still simulated, but the frozen-in tidal model doesn't hold there. Rather than print a misleading score, the result is marked as not scored.</p>
+        </div>
+        <div class="honest-card">
+          <div class="hc-row"><span>Tidal disruption</span><span class="pill warn">not scored</span></div>
+          <div class="hc-row muted"><span>mass ratio</span><span>below 100</span></div>
+          <div class="hc-row muted"><span>reason</span><span>formula out of range</span></div>
+        </div>
+      </div>
+      <p class="cap left">Figures from the project README and benchmarks, as of 14 Nov 2026.</p>
+    </div>
+  </section>
+
+  <!-- PRIVATE -->
+  <section class="section private">
+    <div class="wrap two-col">
+      <div>
+        <h2>Your desk stays on your desk</h2>
+        <p>Everything runs on your laptop. Camera frames, voice and diagrams never leave the machine. The phone camera talks to the laptop over your local network, on HTTPS with a certificate generated on first run.</p>
+        <p>Cloud features exist but are off by default. With <code>ANTHROPIC_API_KEY</code> set, explanations get more fluent; without it, a deterministic writer produces the same structure offline. With <code>FAL_KEY</code>, objects missing from the library can be generated as 3D models, and only the text prompt is sent.</p>
+        <dl class="speeds">
+          <div><dt>scan</dt><dd>~3–4 s warm</dd></div>
+          <div><dt>desk simulation</dt><dd>30–90 ms</dd></div>
+          <div><dt>hand tracking</dt><dd>~13 ms / frame</dd></div>
+          <div><dt>live hand physics</dt><dd>2.2 ms / update</dd></div>
+        </dl>
+      </div>
+      <div class="panel machine">
+        <svg viewBox="0 0 420 300" aria-label="Diagram: all models run inside the laptop; the phone connects over the local network; cloud services are off by default">
+          <rect x="16" y="16" width="270" height="250" rx="12" fill="#fffdf8" stroke="#141414" stroke-width="2.5"/>
+          <text x="34" y="44" class="svg-h">Your MacBook</text>
+          <g class="mods">
+            <rect x="34" y="60" width="234" height="30" rx="6"/><text x="46" y="80">Qwen2.5-VL-3B · 4-bit · MLX</text>
+            <rect x="34" y="98" width="234" height="30" rx="6"/><text x="46" y="118">Depth Anything V2 · SAM 2.1</text>
+            <rect x="34" y="136" width="234" height="30" rx="6"/><text x="46" y="156">Whisper · MediaPipe · GPT-2</text>
+            <rect x="34" y="174" width="234" height="30" rx="6"/><text x="46" y="194">MuJoCo · REBOUND · PySCF</text>
+          </g>
+          <text x="34" y="236" class="svg-tag muted">frames, voice, diagrams: stay here</text>
+          <rect x="330" y="150" width="62" height="110" rx="12" fill="#ffd23f" stroke="#141414" stroke-width="2.5"/>
+          <rect x="340" y="164" width="42" height="74" rx="4" fill="#fffdf8" stroke="#141414" stroke-width="1.5"/>
+          <path d="M286 200 C306 200 310 205 330 205" fill="none" stroke="#141414" stroke-width="2" stroke-dasharray="5 4"/>
+          <text x="300" y="282" class="svg-tag">phone over LAN</text>
+          <path d="M330 52 q0 -20 20 -20 q8 -16 28 -8 q20 -2 22 16 q14 4 10 18 z" fill="#ebe5d8" stroke="#141414" stroke-width="2" opacity=".75"/>
+          <text x="338" y="88" class="svg-tag muted">cloud: off</text>
+          <line x1="286" y1="60" x2="326" y2="60" stroke="#141414" stroke-width="2" stroke-dasharray="2 5" opacity=".5"/>
+          <line x1="300" y1="50" x2="314" y2="70" stroke="#e5484d" stroke-width="2.5"/>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- LIMITS -->
+  <section class="section limits">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>What it can't do yet</h2>
+        <p>Better to know before the demo. Close other heavy apps first: 8 GB is tight.</p>
+      </div>
+      <div class="limits-grid">
+        <div class="limit"><h3>Quick scans guess the back</h3><p>A one-photo scan infers hidden sides from simple shapes. The walk-around scan sees them, but takes about 5 minutes on 8 GB.</p></div>
+        <div class="limit"><h3>Scale can drift</h3><p>A single camera can misjudge size. Calibrate with one object's real height, or use RGB-D input.</p></div>
+        <div class="limit"><h3>Keep the camera still</h3><p>There's no continuous tracking after a scan yet. The phone notices movement and asks for a rescan.</p></div>
+        <div class="limit"><h3>Some objects slip through</h3><p>On our test desk the walk-around scan missed a small ball and carved away a thin clock. We list what it found so you can check.</p></div>
+        <div class="limit"><h3>Scan numbers are from a test desk</h3><p>The walk-around accuracy above was measured on a photoreal synthetic desk with known answers. Real-phone sweeps are next.</p></div>
+        <div class="limit"><h3>Touch pushes, it doesn't grip</h3><p>Fingers push, tip and flick by contact. Picking something up needs a grip assist we haven't built yet; pinch-to-grab covers it for now.</p></div>
+        <div class="limit"><h3>Hand size is estimated</h3><p>🖐 Touch scales your hand from MediaPipe's model, so very large or small hands touch slightly early or late.</p></div>
+        <div class="limit"><h3>Small models misread</h3><p>Messy handwriting or odd objects can trip the local vision model, which is why the reading card is editable.</p></div>
+                <div class="limit"><h3>DFT runs a little low</h3><p>About 3–4% on large combustion reactions. The reported uncertainty covers it.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUICK START -->
+  <section class="section start" id="start">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Run it on your Mac</h2>
+        <p>Requires macOS on Apple Silicon, Python 3.12 and Node 18+. No keys, no account.</p>
+      </div>
+      <div class="steps">
+        <div class="cmd">
+          <div class="cmd-head"><span>Get the code</span><button class="copy" data-copy="git clone https://github.com/iUtsa/causal-world-editor.git && cd causal-world-editor">Copy</button></div>
+          <pre><code>git clone https://github.com/iUtsa/causal-world-editor.git
+cd causal-world-editor</code></pre>
+        </div>
+        <div class="cmd">
+          <div class="cmd-head"><span>Set up the app: Python env, ~250 MB of vision models, UI build</span><button class="copy" data-copy="./setup.sh && .venv/bin/pip install rebound reboundx pyscf rdkit tblite sympy scipy sentence-transformers qrcode trimesh pillow">Copy</button></div>
+          <pre><code>./setup.sh
+.venv/bin/pip install rebound reboundx pyscf \
+  rdkit tblite sympy scipy sentence-transformers \
+  qrcode trimesh pillow</code></pre>
+        </div>
+        <div class="cmd">
+          <div class="cmd-head"><span>Add the local vision model (Qwen2.5-VL-3B on the Apple GPU)</span><button class="copy" data-copy="python3.12 -m venv .venv-ai && .venv-ai/bin/pip install mlx-vlm">Copy</button></div>
+          <pre><code>python3.12 -m venv .venv-ai
+.venv-ai/bin/pip install mlx-vlm</code></pre>
+        </div>
+        <div class="cmd">
+          <div class="cmd-head"><span>Start it, open localhost:8000 and press Get started</span><button class="copy" data-copy="./restart.sh">Copy</button></div>
+          <pre><code>./restart.sh</code></pre>
+        </div>
+      </div>
+      <p class="after">Want the phone as a camera? Click <b>Connect phone</b> in the app and scan the QR code.</p>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta">
+    <div class="wrap cta-inner">
+      <h2>Ask your desk a question.</h2>
+      <div class="hero-actions">
+        <a class="btn btn-orange btn-lg" href="/lab/" data-start>Open the lab <span class="arr" aria-hidden="true">→</span></a>
+        <a class="btn btn-paper btn-lg" href="https://github.com/iUtsa/causal-world-editor" target="_blank" rel="noopener">Get it on GitHub</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-inner">
+    <div>
+      <a class="brand" href="#top"><span>Causal World Editor</span></a>
+      <p class="muted">Free, open source, on-device.</p>
+      <p><a class="foot-link" href="/lab/" data-start>Open the lab →</a></p>
+    </div>
+    <div class="credits">
+      <p><b>3D models</b> Poly Haven (CC0) and Khronos glTF samples. Licence per asset in <code>assets/library/&lt;id&gt;/LICENSE.json</code>.</p>
+      <p><b>Models</b> Depth Anything V2, SAM 2.1, Qwen2.5-VL, Whisper, GPT-2, MediaPipe Hand Landmarker.</p>
+      <p><b>Physics and chemistry</b> MuJoCo, REBOUND, PySCF, tblite (GFN2-xTB), RDKit. Ephemerides from NASA JPL Horizons.</p>
+    </div>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="wipe" aria-hidden="true"><span>Opening the lab…</span></div>
+<script src="/landing/main.js"></script>
+<script src="/landing/fx.js"></script>
+</body>
 </html>
