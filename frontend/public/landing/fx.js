@@ -15,7 +15,7 @@
   const groups = [
     ".section-head", ".two-col > *", ".ways-grid > *", ".flow > *", ".sim-grid > *", ".tabs", ".pipe > .stage-card",
     ".how-more > *", ".stats > *", ".laws", ".honest", ".limits-grid > *", ".steps > *", ".touch-grid > *", ".cta-inner > *",
-    ".ways h2",
+    ".ways h2", ".demo",
   ];
   groups.forEach((sel) => $$(sel).forEach((el, i) => {
     if (el.closest(".hero")) return;
@@ -236,10 +236,10 @@
       ctx.fillStyle = "#d9b382"; ctx.fillRect(tx0, ty, tx1 - tx0, ch - ty);
       ctx.strokeStyle = "#c99d68"; ctx.lineWidth = 1.2;
       for (let y = ty + 10; y < ch; y += 14) { ctx.beginPath(); ctx.moveTo(tx0, y); ctx.bezierCurveTo(tx0 + 80, y - 4, tx1 - 80, y + 4, tx1, y); ctx.stroke(); }
-      ctx.strokeStyle = "#141414"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(tx0, ty); ctx.lineTo(tx1, ty); ctx.stroke();
+      ctx.strokeStyle = "#1e2622"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(tx0, ty); ctx.lineTo(tx1, ty); ctx.stroke();
       // bodies
       for (const b of bodies) {
-        ctx.fillStyle = b.c; ctx.strokeStyle = "#141414"; ctx.lineWidth = 2;
+        ctx.fillStyle = b.c; ctx.strokeStyle = "#1e2622"; ctx.lineWidth = 2;
         if (b.kind === "box") {
           const [x0, y0] = toPx(b.x - b.hw, b.y + b.hh);
           roundRect(x0, y0, 2 * b.hw * scale, 2 * b.hh * scale, 4); ctx.fill(); ctx.stroke();
@@ -260,21 +260,21 @@
           const [x, y] = toPx(b.cp[0], b.cp[1]), r = Math.min(26, 7 + 4 * Math.sqrt(b.f));
           ctx.fillStyle = "rgba(255,90,31,.22)"; ctx.strokeStyle = "#ff5a1f"; ctx.lineWidth = 2;
           ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-          ctx.fillStyle = "#141414"; ctx.font = "600 12px 'IBM Plex Mono', monospace"; ctx.textAlign = "left";
+          ctx.fillStyle = "#1e2622"; ctx.font = "600 12px 'IBM Plex Mono', monospace"; ctx.textAlign = "left";
           ctx.fillText(`${b.f.toFixed(1)} N`, x + r + 4, y - 4);
         }
       }
       // the hand: bones + joints, like the app's skeleton overlay
       if (hand) {
         const ps = hand.parts.map((p) => toPx(p.x, p.y)), [wx, wy] = toPx(hand.x + 0.09, hand.y + 0.16);
-        ctx.strokeStyle = "#141414"; ctx.lineWidth = 3; ctx.lineCap = "round";
+        ctx.strokeStyle = "#1e2622"; ctx.lineWidth = 3; ctx.lineCap = "round";
         ps.forEach(([x, y]) => { ctx.beginPath(); ctx.moveTo(wx, wy); ctx.lineTo(x, y); ctx.stroke(); });
         hand.parts.forEach((p, i) => {
           const [x, y] = ps[i];
           ctx.fillStyle = "#2f5bff"; ctx.globalAlpha = .18; ctx.beginPath(); ctx.arc(x, y, p.r * scale, 0, Math.PI * 2); ctx.fill(); ctx.globalAlpha = 1;
           ctx.fillStyle = "#fffdf8"; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(x, y, 5, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
         });
-        ctx.fillStyle = "#141414"; ctx.beginPath(); ctx.arc(wx, wy, 6, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = "#1e2622"; ctx.beginPath(); ctx.arc(wx, wy, 6, 0, Math.PI * 2); ctx.fill();
       }
       if (meta) meta.textContent = touching.length ? `touching ${touching.join(" · ")}` : hand ? "push something" : "move over the table";
     }
@@ -364,4 +364,27 @@
       else { cancelAnimationFrame(raf); raf = 0; }
     }).observe(svg);
   }
+})();
+
+// ---- demo videos: two tabs, play only while on screen
+(() => {
+  const root = document.querySelector("[data-demo]");
+  if (!root) return;
+  const vids = [...root.querySelectorAll("video")], caps = [...root.querySelectorAll(".demo-cap")];
+  const tabs = [...root.querySelectorAll(".demo-tabs button")], btn = root.querySelector(".demo-play");
+  let cur = "real", visible = false, paused = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const sync = () => {
+    vids.forEach((v) => {
+      const on = v.dataset.v === cur;
+      v.classList.toggle("on", on);
+      if (on && visible && !paused) { v.preload = "auto"; v.play().catch(() => {}); } else v.pause();
+    });
+    caps.forEach((c) => { c.hidden = c.dataset.v !== cur; });
+    tabs.forEach((t) => { const on = t.dataset.v === cur; t.classList.toggle("on", on); t.setAttribute("aria-selected", on); });
+    btn.textContent = paused ? "▶" : "❚❚"; btn.setAttribute("aria-label", paused ? "Play video" : "Pause video");
+  };
+  tabs.forEach((t) => t.addEventListener("click", () => { cur = t.dataset.v; const v = vids.find((x) => x.dataset.v === cur); if (v) v.currentTime = 0; sync(); }));
+  btn.addEventListener("click", () => { paused = !paused; sync(); });
+  new IntersectionObserver((es) => { visible = es[0].isIntersecting; sync(); }, { threshold: 0.35 }).observe(root.querySelector(".demo-frame"));
+  sync();
 })();
