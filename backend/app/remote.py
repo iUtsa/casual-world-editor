@@ -38,7 +38,7 @@ def ensure_cert() -> tuple[Path, Path]:
     key, crt, stamp = CERT_DIR / "key.pem", CERT_DIR / "cert.pem", CERT_DIR / "ip.txt"
     if not (key.exists() and crt.exists() and stamp.exists() and stamp.read_text() == ip):
         subprocess.run(["openssl", "req", "-x509", "-newkey", "rsa:2048", "-nodes", "-days", "825",
-                        "-keyout", str(key), "-out", str(crt), "-subj", "/CN=Causal World Editor (local)",
+                        "-keyout", str(key), "-out", str(crt), "-subj", "/CN=Casual World Editor (local)",
                         "-addext", f"subjectAltName=IP:{ip},IP:127.0.0.1,DNS:localhost"],
                        check=True, capture_output=True)
         stamp.write_text(ip)
