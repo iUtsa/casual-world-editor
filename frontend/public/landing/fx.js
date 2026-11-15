@@ -388,3 +388,15 @@
   new IntersectionObserver((es) => { visible = es[0].isIntersecting; sync(); }, { threshold: 0.35 }).observe(root.querySelector(".demo-frame"));
   sync();
 })();
+
+// ---- logo: on load (and on hover) the ball flies along the dashed arc and lands on the ground
+(() => {
+  const mark = document.querySelector(".nav .mark-anim");
+  if (!mark) return;
+  const home = mark.querySelector(".ball-home"), fly = mark.querySelector("animateMotion");
+  const show = () => mark.classList.add("played");      // the ball is hidden (CSS) until it's thrown
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches || !home || !fly || typeof fly.beginElement !== "function") { show(); return; }
+  const play = () => { home.setAttribute("transform", ""); fly.beginElement(); show(); };
+  setTimeout(play, 400);
+  mark.closest(".brand")?.addEventListener("mouseenter", play);
+})();
