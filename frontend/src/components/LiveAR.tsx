@@ -272,19 +272,34 @@ export default function LiveAR(p: Props) {
           )}
           {scene && view === "camera" && hands && !live && <div className="hint-pill warn">✋ Hands need live video — {source.kind === "phone" ? "open the phone page and keep it streaming" : "start the camera"}</div>}
 
-          <div className="live-tools">
+        </div>
+        {/* the tools sit under the camera, grouped by what they do, so they never cover the picture or the hints */}
+        <div className="live-dock" role="toolbar" aria-label="Live AR tools">
+          <div className="dock-group">
+            <span className="dock-label">Scan</span>
             <button onClick={capture} disabled={!!p.busy} title="Map the space again (after you move the camera or the objects)">⟳ Rescan</button>
             <button onClick={() => sweepInput.current?.click()} disabled={!!p.busy || sweep?.state === "running"}
               title="Best quality: a 10–20 s video moving slowly around the table, ending where the camera will stay. Every object becomes a real 3D model.">🎥 3D scan</button>
             <input ref={sweepInput} type="file" accept="video/*" hidden onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; if (f) startSweep(f); }} />
-            {scene && <button onClick={p.onBall} disabled={!!p.busy} title="Put a real-size virtual baseball on your desk — grab it with ✋ Hands and throw it at your things">🎾 Ball</button>}
-            {scene && <button className={hands ? "on" : ""} onClick={toggleHands} title="Use your real hand: pinch to grab, flick to throw, swipe to push">✋ Hands{hands ? " on" : ""}</button>}
-            {scene && <button className={touch ? "on" : ""} disabled={!!p.busy}
-              onClick={() => { const on = !touch; setTouch(on); if (on) { setHands(false); setView("camera"); } }}
-              title="Your hand as physics, live: your fingers push, tip and flick things by touch">🖐 Touch{touch ? " on" : ""}</button>}
-            {(run || shownSim) && <button onClick={p.onReplay} title="Replay">▶ Replay</button>}
-            {(run || shownSim) && <button onClick={p.onOpenStudio} title="Every measurement as graphs, edit & compare">⧉ Graphs</button>}
           </div>
+          {scene && (
+            <div className="dock-group">
+              <span className="dock-label">Play</span>
+              <button onClick={p.onBall} disabled={!!p.busy} title="Put a real-size virtual baseball on your desk — grab it with ✋ Hands and throw it at your things">🎾 Ball</button>
+              <button className={hands ? "on" : ""} aria-pressed={hands} onClick={toggleHands} title="Use your real hand: pinch to grab, flick to throw, swipe to push">✋ Hands{hands ? " on" : ""}</button>
+              <button className={`touch ${touch ? "on" : ""}`} aria-pressed={touch} disabled={!!p.busy}
+                onClick={() => { const on = !touch; setTouch(on); if (on) { setHands(false); setView("camera"); } }}
+                title="Your hand as physics, live: your fingers push, tip and flick things by touch">🖐 Touch{touch ? " on" : ""}</button>
+            </div>
+          )}
+          <div className="grow" />
+          {(run || shownSim) && (
+            <div className="dock-group">
+              <span className="dock-label">Result</span>
+              <button onClick={p.onReplay} title="Replay">▶ Replay</button>
+              <button onClick={p.onOpenStudio} title="Every measurement as graphs, edit & compare">⧉ Graphs</button>
+            </div>
+          )}
         </div>
         <MiniPlayer run={run} sim={p.sim} />
       </section>
