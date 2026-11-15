@@ -1,12 +1,12 @@
 <div align="center">
 
-<a href="https://causalworld.pages.dev"><img src="docs/assets/banner.png" alt="Casual World Editor: what you imagine, you can simulate" width="100%"></a>
+<a href="https://casual-world-editor.pages.dev"><img src="docs/assets/banner.png" alt="Casual World Editor: what you imagine, you can simulate" width="100%"></a>
 
 <br>
 
 **What you imagine, you can simulate.** Point a camera at the real world, snap a diagram, or just describe a world that doesn't exist. Ask “what if?”, push things with your real hand, and check every answer against theory.
 
-[![Live demo](https://img.shields.io/badge/live_demo-causalworld.pages.dev-C8F135?style=for-the-badge&labelColor=1E2622)](https://causalworld.pages.dev)
+[![Live demo](https://img.shields.io/badge/live_demo-casual-world-editor.pages.dev-C8F135?style=for-the-badge&labelColor=1E2622)](https://casual-world-editor.pages.dev)
 [![License](https://img.shields.io/badge/license-Apache_2.0-F4F1E8?style=for-the-badge&labelColor=1E2622)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-151_passing-13945b?style=for-the-badge&labelColor=1E2622)](#-accuracy-you-can-check)
 [![On-device](https://img.shields.io/badge/runs-100%25_on--device-C8F135?style=for-the-badge&labelColor=1E2622)](#-private-by-design)
@@ -19,7 +19,7 @@
 ![MediaPipe](https://img.shields.io/badge/MediaPipe-1E2622?style=flat-square&logo=google&logoColor=white)
 ![Apple Silicon](https://img.shields.io/badge/Apple_Silicon-1E2622?style=flat-square&logo=apple&logoColor=white)
 
-[**Try it**](https://causalworld.pages.dev) · [Watch](#-see-it-work) · [Features](#-what-it-does) · [How it works](#-how-it-works) · [Accuracy](#-accuracy-you-can-check) · [Quick start](#-quick-start) · [Roadmap](#-roadmap)
+[**Try it**](https://casual-world-editor.pages.dev) · [Watch](#-see-it-work) · [Features](#-what-it-does) · [How it works](#-how-it-works) · [Accuracy](#-accuracy-you-can-check) · [Quick start](#-quick-start) · [Roadmap](#-roadmap)
 
 </div>
 
@@ -33,8 +33,8 @@
 <th width="50%">✨ In your imagination</th>
 </tr>
 <tr>
-<td><a href="https://causalworld.pages.dev/landing/media/real.mp4"><img src="docs/assets/real.gif" alt="The real app: a desk is mapped, an object inspected, a baseball dropped on it, the 3D twin orbited, and a hand pushes objects in Touch"></a></td>
-<td><a href="https://causalworld.pages.dev/landing/media/imagine.mp4"><img src="docs/assets/imagine.gif" alt="The real app: two blue whales collide, Jupiter is put in Earth's orbit, methane burns, and GPT-2 forms its next word layer by layer"></a></td>
+<td><a href="https://casual-world-editor.pages.dev/landing/media/real.mp4"><img src="docs/assets/real.gif" alt="The real app: a desk is mapped, an object inspected, a baseball dropped on it, the 3D twin orbited, and a hand pushes objects in Touch"></a></td>
+<td><a href="https://casual-world-editor.pages.dev/landing/media/imagine.mp4"><img src="docs/assets/imagine.gif" alt="The real app: two blue whales collide, Jupiter is put in Earth's orbit, methane burns, and GPT-2 forms its next word layer by layer"></a></td>
 </tr>
 <tr>
 <td valign="top">A desk is <b>mapped</b> from one camera frame, an object <b>inspected</b>, <i>“drop a baseball on the red box”</i> <b>simulated and checked</b>, the 3D twin orbited, and a hand <b>pushes things</b> in 🖐 Touch.</td>
@@ -174,7 +174,7 @@ features exist but are off by default (`ANTHROPIC_API_KEY` for more fluent expla
 > Requires macOS on Apple Silicon, Python 3.12 and Node 18+. Built and tested on an M1 MacBook with 8 GB.
 
 ```bash
-git clone https://github.com/iUtsa/causal-world-editor.git && cd causal-world-editor
+git clone https://github.com/iUtsa/casual-world-editor.git && cd casual-world-editor
 
 ./setup.sh                                   # Python env, ~250 MB of vision models, UI build
 .venv/bin/pip install rebound reboundx pyscf rdkit tblite sympy scipy sentence-transformers qrcode trimesh pillow
@@ -195,7 +195,7 @@ deploy/go_public.sh
 
 Serves the landing page from Cloudflare Pages (always up) and the lab, API, live hand and phone camera from your Mac
 through a free Cloudflare tunnel, at one HTTPS address. Visitors' phones work from any network, no certificate warning.
-Our instance: **[causalworld.pages.dev](https://causalworld.pages.dev)** (the lab is live while the team's laptop is
+Our instance: **[casual-world-editor.pages.dev](https://casual-world-editor.pages.dev)** (the lab is live while the team's laptop is
 serving; otherwise it says so).
 
 ## 🧭 Known limitations
@@ -264,4 +264,4 @@ dark backgrounds, one-colour marks, a Devpost thumbnail and colour/type guidance
 
 [Apache License 2.0](LICENSE). Third-party models and assets keep their own licences.
 
-<div align="center"><br><sub><b>Casual World Editor</b> · what you imagine, you can simulate · <a href="https://causalworld.pages.dev">causalworld.pages.dev</a></sub></div>
+<div align="center"><br><sub><b>Casual World Editor</b> · what you imagine, you can simulate · <a href="https://casual-world-editor.pages.dev">casual-world-editor.pages.dev</a></sub></div>
