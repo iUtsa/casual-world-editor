@@ -1,6 +1,6 @@
-<p align="center"><img src="svg/cwe-logo-horizontal.svg" alt="Causal World Editor" width="520"></p>
+<p align="center"><img src="svg/cwe-logo-horizontal.svg" alt="Casual World Editor" width="520"></p>
 
-# Causal World Editor · logo kit
+# Casual World Editor · logo kit
 
 The mark is a throw: a dashed arc and a ball landing on the ground. It is the smallest possible simulation, the
 moment an imagined motion becomes a real one. Everything here is vector; the wordmark is outlined, so the SVGs look the
