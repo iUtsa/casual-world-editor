@@ -31,7 +31,7 @@ def configured() -> bool:
 
 
 def _fetch(url: str) -> bytes:
-    req = urllib.request.Request(url, headers={"User-Agent": "causal-world-editor/0.1"})
+    req = urllib.request.Request(url, headers={"User-Agent": "casual-world-editor/0.1"})
     with urllib.request.urlopen(req, timeout=120) as r:
         return r.read()
 
