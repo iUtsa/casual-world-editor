@@ -289,7 +289,7 @@ def build_mjcf(scene: Scene, gravity: float = 9.81, spawns: list[dict] | None = 
         bodies.append(b_xml)
         acts.append(act_xml)
     return f"""
-<mujoco model="causal_world">
+<mujoco model="casual_world">
   <compiler angle="radian"/>
   <option timestep="{env.get("timestep", config.SIM_TIMESTEP)}" gravity="0 0 {-gravity}" integrator="implicitfast" cone="elliptic" impratio="5"
           density="0" viscosity="0"/>
