@@ -1,5 +1,14 @@
 <div align="center">
 
+<a href="https://casual-world-editor.pages.dev">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="logo/svg/cwe-logo-horizontal-on-dark-animated.svg">
+    <img src="logo/svg/cwe-logo-horizontal-animated.svg" alt="Casual World Editor" width="440">
+  </picture>
+</a>
+
+<br><br>
+
 <a href="https://casual-world-editor.pages.dev"><img src="docs/assets/banner.png" alt="Casual World Editor: what you imagine, you can simulate" width="100%"></a>
 
 <br>
