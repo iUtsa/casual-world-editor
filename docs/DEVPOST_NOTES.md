@@ -11,7 +11,7 @@ in their head" (cognitive scientists call this mental animation; Mary Hegarty's 
 Labs that let you try things cost equipment most schools don't have. We wanted the diagram, or the student's own
 desk, to move, and to answer "what if?" with numbers you can check.
 
-**Tagline:** Stop imagining. Start simulating.
+**Tagline:** What you imagine, you can simulate.
 
 ## What it does
 
