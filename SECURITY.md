@@ -1,6 +1,6 @@
 # Security
 
-Causal World Editor runs locally: camera frames, voice and diagrams stay on the machine, and the phone connects over
+Casual World Editor runs locally: camera frames, voice and diagrams stay on the machine, and the phone connects over
 the local network on HTTPS. The optional public demo (`deploy/go_public.sh`) exposes the app through a Cloudflare
 tunnel, so treat it as a demo, not a hardened service: run it only while you are presenting.
 
