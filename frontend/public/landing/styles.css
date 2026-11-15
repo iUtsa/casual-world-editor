@@ -1,10 +1,10 @@
 :root {
-  --paper: #f6f4ee;
-  --page: #f1eee5;
+  --paper: #f4f1e8;
+  --page: #ece8dc;
   --panel: #fffdf8;
-  --ink: #141414;
+  --ink: #1e2622;
   --muted: #5f5a50;
-  --line: #141414;
+  --line: #1e2622;
   --soft-line: #d9d3c6;
   --shadow: #d3ccc0;
   --orange: #ff5a1f;
@@ -13,7 +13,8 @@
   --blue-soft: #e3e9ff;
   --green: #13945b;
   --green-soft: #dcf3e7;
-  --yellow: #ffd23f;
+  --yellow: #c8f135;   /* brand lime (kept under its old name) */
+  --lime: #c8f135;
   --red: #e5484d;
   --display: "Bricolage Grotesque", "Instrument Sans", system-ui, sans-serif;
   --sans: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -58,7 +59,7 @@ p { margin: 0 0 14px; }
 }
 .btn:hover { transform: translate(-1px, -1px); box-shadow: 5px 5px 0 var(--ink); }
 .btn:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--ink); }
-.btn-orange { background: var(--orange); color: #fff; }
+.btn-orange { background: var(--lime); color: var(--ink); }
 .btn-paper { background: var(--panel); color: var(--ink); }
 .btn-ink { background: var(--ink); color: var(--paper); box-shadow: 3px 3px 0 var(--shadow); }
 .btn-ink:hover { box-shadow: 4px 4px 0 var(--shadow); }
@@ -157,7 +158,7 @@ p { margin: 0 0 14px; }
 .svg-tag { font: 500 12px var(--mono); fill: var(--ink); }
 .svg-tag.muted { fill: var(--muted); }
 .svg-tag.blue { fill: var(--blue); }
-.svg-tag.light { fill: #f6f4ee; }
+.svg-tag.light { fill: #f4f1e8; }
 .svg-h { font: 700 17px var(--display); fill: var(--ink); }
 .leader { stroke: var(--ink); stroke-width: 1.2; }
 .flash { animation: flash 1.2s ease; }
@@ -211,7 +212,7 @@ p { margin: 0 0 14px; }
 .try { background: var(--page); }
 .flow { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1.1fr); gap: 20px; align-items: center; margin-bottom: 28px; }
 .photo svg { width: 100%; }
-.marker { font: 700 17px "Comic Sans MS", "Chalkboard SE", "Marker Felt", cursive; fill: #141414; }
+.marker { font: 700 17px "Comic Sans MS", "Chalkboard SE", "Marker Felt", cursive; fill: #1e2622; }
 .marker.red { fill: var(--red); }
 .flow-arrow { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); text-align: center; width: 120px; }
 .flow-arrow svg { width: 60px; }
@@ -373,17 +374,17 @@ p { margin: 0 0 14px; }
 .cmd { background: var(--ink); color: #f1ede3; border-radius: 12px; border: 2px solid var(--ink); box-shadow: var(--off) var(--off) 0 var(--shadow); overflow: hidden; }
 .cmd-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px; border-bottom: 1px solid #3a3833; font-size: 14px; color: #c9c3b6; }
 .cmd pre { margin: 0; padding: 16px; overflow-x: auto; font: 14px/1.6 var(--mono); }
-.cmd code { background: none; padding: 0; color: #f6f4ee; font-size: 14px; }
-.copy { font: 600 13px var(--sans); background: #f6f4ee; color: var(--ink); border: none; border-radius: 6px; padding: 6px 10px; cursor: pointer; flex: none; }
+.cmd code { background: none; padding: 0; color: #f4f1e8; font-size: 14px; }
+.copy { font: 600 13px var(--sans); background: #f4f1e8; color: var(--ink); border: none; border-radius: 6px; padding: 6px 10px; cursor: pointer; flex: none; }
 .copy:hover { background: var(--yellow); }
 .after { margin-top: 26px; font-size: 16px; color: var(--muted); }
 
 /* cta + footer */
-.cta { background: var(--orange); border-bottom: 2px solid var(--line); padding: 84px 0; }
+.cta { background: var(--ink); border-bottom: 2px solid var(--line); padding: 84px 0; }
 .cta-inner { text-align: center; }
-.cta h2 { color: #fff; font-size: clamp(38px, 6vw, 76px); letter-spacing: -0.035em; }
+.cta h2 { color: var(--paper); font-size: clamp(38px, 6vw, 76px); letter-spacing: -0.035em; }
 .cta .hero-actions { justify-content: center; margin-bottom: 0; }
-.cta .btn-orange { background: var(--ink); }
+.cta .btn-orange { background: var(--lime); color: var(--ink); box-shadow: 4px 4px 0 #000; }
 .foot { padding: 44px 0 56px; }
 .foot-inner { display: grid; grid-template-columns: 1fr 2fr; gap: 40px; }
 .foot .muted { margin-top: 8px; font-size: 15px; }
