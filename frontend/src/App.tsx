@@ -335,7 +335,12 @@ export default function App() {
 
   const top = (
     <header>
-      <h1 className="brand"><span className="logo">◎</span> Causal <span className="brand-sub">World Lab</span></h1>
+      <h1 style={{ margin: 0 }}>
+        <a className="brand" href="/" title="Back to the home page">
+          <svg className="mark" viewBox="0 0 32 32" aria-hidden="true"><rect x="1" y="1" width="30" height="30" rx="7" fill="#141414" /><path d="M5 25 L27 25 L5 12 Z" fill="none" stroke="#f6f4ee" strokeWidth="1.8" strokeLinejoin="round" /><rect x="11.2" y="11.4" width="6" height="6" rx="1" transform="rotate(30.6 14.2 14.4)" fill="#ff5a1f" /><path d="M20 8 q4 1 6 6" fill="none" stroke="#ffd23f" strokeWidth="1.8" strokeDasharray="1.6 2.2" strokeLinecap="round" /></svg>
+          <span>Causal World Editor</span><span className="lab-tag">Lab</span>
+        </a>
+      </h1>
       <div className="seg-toggle modes">
         <button className={mode === "live" ? "on" : ""} onClick={() => setMode("live")}>◉ Live AR</button>
         <button className={mode !== "live" ? "on" : ""} onClick={() => mode === "live" && setMode("lab")}>Studio</button>
