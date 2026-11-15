@@ -7,7 +7,7 @@ import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).parent / "library"
-UA = {"User-Agent": "causal-world-editor/0.1 (local research prototype)"}
+UA = {"User-Agent": "casual-world-editor/0.1 (local research prototype)"}
 
 POLYHAVEN = ["rubber_duck_toy", "baseball_01", "lemon", "can_rusted", "cardboard_box_01", "wooden_crate_01",
              "garden_gnome", "alarm_clock_01", "croissant", "yellow_onion", "wooden_bowl_01", "chess_set",
