@@ -618,7 +618,7 @@ function Director({ run, bounds, opts, resetKey }: { run: ExpRun; bounds: THREE.
     if (travelling && movers.length) {
       // frame the runner/swimmer/flier at its own scale and follow it, not the whole 100 m track
       const big = Math.max(...movers.map((o) => Math.max(...o.dims)));
-      const sim = run.sim, f0 = Math.round(sim.segments[sim.segments.length - 1].t_start * sim.fps) + 1;
+      const sim = run.sim, f0 = Math.round((sim.segments[sim.segments.length - 1]?.t_start ?? 0) * sim.fps) + 1;
       const pts = movers.map((o) => sim.frames[Math.min(sim.frames.length - 1, f0)][sim.object_ids.indexOf(o.sid!)]);
       c = new THREE.Vector3(pts.reduce((s_, p) => s_ + p[0], 0) / pts.length, pts.reduce((s_, p) => s_ + p[1], 0) / pts.length, pts.reduce((s_, p) => s_ + p[2], 0) / pts.length + big * 0.4);
       size = new THREE.Vector3(big * 3 + (movers.length > 1 ? 4 * big : 0), big * 2, big * 1.5);
