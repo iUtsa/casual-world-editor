@@ -107,7 +107,7 @@ export default function App() {
     if (simChanged) {
       const s = (p as SimPayload).sim ?? null;
       setSim(s); setEx(null);
-      if (s) { clock.rate = 1; clock.duration = s.duration; clock.play(s.segments[s.segments.length - 1].t_start); }
+      if (s) { clock.rate = 1; clock.duration = s.duration; clock.play(s.segments[s.segments.length - 1]?.t_start ?? 0); }
       else { clock.duration = 0; clock.set(0); clock.pause(); }
     }
   }, []);
@@ -125,7 +125,7 @@ export default function App() {
     clock.rate = 1;
     clock.duration = r.duration;
     const segs = r.sim.segments;
-    clock.play(Math.max(0, segs[segs.length - 1].t_start - 0.25));
+    clock.play(Math.max(0, (segs[segs.length - 1]?.t_start ?? 0) - 0.25));
   }, []);
 
   const onResponse = useCallback((res: ExpResponse) => {
@@ -202,6 +202,17 @@ export default function App() {
       text: n ? `I can see ${n} real object${n === 1 ? "" : "s"}: ${p.scene!.objects.map((o) => o.label).join(", ")}. Try “drop a baseball on the ${p.scene!.objects[0].label}” — or anything else.`
         : "I've mapped the surface. Ask for any experiment and it will appear here." }]);
   });
+  /** 🖐 Touch: the live session needs a simulation to draw into (first message); when it ends, the official replay. */
+  const liveSim = (s: Sim) => { setSim((cur) => cur ?? s); };
+  const liveDone = async (s: Sim) => {
+    const p = await api.scene();
+    applyPayload({ ...p, sim: s }, true);
+    clock.set(0); clock.play?.();
+    const moved = s.moved_ids.map((id) => p.scene?.objects.find((o) => o.id === id)?.label ?? s.labels?.[id] ?? id);
+    setChat((c) => [...c, { id: Math.random().toString(36).slice(2), role: "ai",
+      text: moved.length ? `🖐 Your hand moved the ${moved.join(", ")}. That's the replay: same physics, so you can scrub it, open ⧉ Graphs, or undo it.`
+        : "🖐 Your hand didn't move anything that time." }]);
+  };
   const sweepDone = async (job: SweepJob) => {
     const p = await api.scene();
     resetSimState(); setSelected(null);
@@ -316,7 +327,7 @@ export default function App() {
   const otherRun = run && !isMech(run) ? run : null;
   const worldView = (mech && mech.setting !== "scene" && (show === "world" || !scene)) || (otherRun && (show === "world" || !scene));
   const playDuration = otherRun ? otherRun.duration : worldView ? mech!.duration : sim?.duration ?? 0;
-  const playStart = otherRun ? 0 : worldView ? Math.max(0, mech!.sim.segments[mech!.sim.segments.length - 1].t_start - 0.25) : sim ? sim.segments[sim.segments.length - 1].t_start : 0;
+  const playStart = otherRun ? 0 : worldView ? Math.max(0, (mech!.sim.segments[mech!.sim.segments.length - 1]?.t_start ?? 0) - 0.25) : sim ? (sim.segments[sim.segments.length - 1]?.t_start ?? 0) : 0;
   const playFx: FxEvent[] = otherRun?.domain === "gravity"
     ? otherRun.events.map((e) => ({ t: (e.t / Math.max(1, otherRun.sim_seconds)) * otherRun.duration, kind: "hit", pos: e.pos, force: e.energy, a: e.a, scale: 1 }))
     : worldView && mech ? mech.fx : mech?.setting === "scene" ? mech.fx : [];
@@ -359,7 +370,7 @@ export default function App() {
         {top}
         <LiveAR scene={scene} payload={payload} sim={sim} run={liveRun ? run : null} assets={assetMap} source={source} setSource={(x, f) => setSource(x, f)} frameKey={frameKey} staleSceneId={bootSceneId} phoneOn={phoneOn} phoneFps={live?.phone.fps ?? 0}
           selected={selected} onSelect={setSelected}
-          busy={busy} messages={chat} onSend={chatSend} onScan={liveScan} onSweepDone={sweepDone} hfov={hfov} onOpenStudio={() => setMode("lab")} onPhone={() => setShowPhone(true)}
+          busy={busy} messages={chat} onSend={chatSend} onScan={liveScan} onSweepDone={sweepDone} hfov={hfov} onLiveSim={liveSim} onLiveDone={liveDone} onOpenStudio={() => setMode("lab")} onPhone={() => setShowPhone(true)}
           onReplay={() => { clock.rate = 1; clock.play(0); }} onReading={onReading} onRunReading={runReading} onHand={handAct} onBall={addBall} />
         {error && <div className="toast" onClick={() => setError(null)}>{error}</div>}
         {phoneModal}
