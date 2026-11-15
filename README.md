@@ -1,6 +1,6 @@
 <div align="center">
 
-<a href="https://causalworld.pages.dev"><img src="docs/assets/banner.png" alt="Causal World Editor: what you imagine, you can simulate" width="100%"></a>
+<a href="https://causalworld.pages.dev"><img src="docs/assets/banner.png" alt="Casual World Editor: what you imagine, you can simulate" width="100%"></a>
 
 <br>
 
@@ -50,7 +50,7 @@ Every idea starts as a picture in your head: a block on a ramp, two planets pass
 a reaction you're curious about. A still picture, a diagram or a formula only shows the first frame, and turning it into
 something you can actually test usually takes equipment, code or a lab.
 
-**Causal World Editor runs it.** Show it the real thing through a camera, photograph a diagram, or describe something
+**Casual World Editor runs it.** Show it the real thing through a camera, photograph a diagram, or describe something
 that could never fit on a desk. It builds the world, simulates it with a real physics engine, lets you change anything,
 and shows the measured result next to the theoretical prediction, so you get an answer you can verify, not a guess.
 
@@ -244,7 +244,7 @@ assets/                 CC0 3D object library (licence per asset)
 
 ## 🎨 Brand
 
-<img src="logo/svg/cwe-icon.svg" width="64" align="left" alt="Causal World Editor icon" hspace="12">
+<img src="logo/svg/cwe-icon.svg" width="64" align="left" alt="Casual World Editor icon" hspace="12">
 
 The mark is a throw (a dashed arc and a ball landing), the smallest possible simulation. Icons, lockups for light and
 dark backgrounds, one-colour marks, a Devpost thumbnail and colour/type guidance are in **[`logo/`](logo/)**. Ink
@@ -264,4 +264,4 @@ dark backgrounds, one-colour marks, a Devpost thumbnail and colour/type guidance
 
 [Apache License 2.0](LICENSE). Third-party models and assets keep their own licences.
 
-<div align="center"><br><sub><b>Causal World Editor</b> · what you imagine, you can simulate · <a href="https://causalworld.pages.dev">causalworld.pages.dev</a></sub></div>
+<div align="center"><br><sub><b>Casual World Editor</b> · what you imagine, you can simulate · <a href="https://causalworld.pages.dev">causalworld.pages.dev</a></sub></div>
