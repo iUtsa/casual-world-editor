@@ -1,4 +1,4 @@
-/* causalworld.pages.dev: the landing page is served by Cloudflare (always online); everything else (the lab, the API,
+/* casual-world-editor.pages.dev: the landing page is served by Cloudflare (always online); everything else (the lab, the API,
    the live-hand WebSocket, the phone page, 3D assets) is passed through to the Mac that runs the app, over a
    Cloudflare tunnel. ORIGIN is that tunnel's address, written by deploy/go_public.sh at each start. */
 import { ORIGIN } from "./_origin.js";
