@@ -338,7 +338,7 @@ export default function App() {
       <h1 style={{ margin: 0 }}>
         <a className="brand" href="/" title="Back to the home page">
           <img className="mark" src="/landing/brand/cwe-icon.svg" alt="" width={30} height={30} />
-          <span>Causal World Editor</span><span className="lab-tag">Lab</span>
+          <span>Casual World Editor</span><span className="lab-tag">Lab</span>
         </a>
       </h1>
       <div className="seg-toggle modes">
