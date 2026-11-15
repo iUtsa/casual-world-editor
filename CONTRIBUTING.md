@@ -1,4 +1,4 @@
-# Contributing to Causal World Editor
+# Contributing to Casual World Editor
 
 Thanks for helping. A few things keep the project trustworthy:
 
