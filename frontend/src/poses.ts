@@ -3,8 +3,19 @@ import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeom
 import type { Camera, SceneObject, Sim } from "./types";
 import { scannedNow } from "./scanned";
 
+/** Live physics with the user's hand (/ws/hand): while active, every view shows the server's current poses
+ *  instead of the recorded frames. `moved` lists objects the hand has displaced (they render as moving). */
+export const LIVE = { active: false, poses: {} as Record<string, number[]>, moved: new Set<string>(), version: 0 };
+const liveListeners = new Set<() => void>();
+export function bumpLive() { LIVE.version++; liveListeners.forEach((f) => f()); }
+export function onLive(f: () => void) { liveListeners.add(f); return () => { liveListeners.delete(f); }; }
+
 /** Interpolated pose of object i at time t (seconds). */
 export function poseAt(sim: Sim, i: number, t: number, outPos: THREE.Vector3, outQuat: THREE.Quaternion) {
+  if (LIVE.active) {
+    const lp = LIVE.poses[sim.object_ids[i]];                 // [x, y, z, qw, qx, qy, qz] (MuJoCo order)
+    if (lp) { outPos.set(lp[0], lp[1], lp[2]); outQuat.set(lp[4], lp[5], lp[6], lp[3]); return; }
+  }
   const f = Math.max(0, Math.min(sim.frames.length - 1, t * sim.fps));
   const a = Math.floor(f);
   const b = Math.min(sim.frames.length - 1, a + 1);
