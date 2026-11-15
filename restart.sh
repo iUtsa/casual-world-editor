@@ -1,8 +1,8 @@
 #!/bin/bash
 # Stop any running instance, wait until the ports are really free, start, wait until healthy.
 cd "$(dirname "$0")"
-if launchctl print "gui/$(id -u)/com.causalworld.app" >/dev/null 2>&1; then   # running as a service (deploy/service.sh)
-  pkill -f "backend/ai_worker.py"; launchctl kickstart -k "gui/$(id -u)/com.causalworld.app"
+if launchctl print "gui/$(id -u)/com.casualworld.app" >/dev/null 2>&1; then   # running as a service (deploy/service.sh)
+  pkill -f "backend/ai_worker.py"; launchctl kickstart -k "gui/$(id -u)/com.casualworld.app"
 else
   pkill -f "backend/serve.py" ; pkill -f "uvicorn backend.app.main:app" ; pkill -f "backend/ai_worker.py"
   for i in $(seq 1 40); do
