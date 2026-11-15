@@ -1,4 +1,4 @@
-"""FastAPI server for the Live Causal World Editor.
+"""FastAPI server for the Live Casual World Editor.
 
 Run:  .venv/bin/uvicorn backend.app.main:app --port 8000   (from the repo root)
 """
@@ -31,7 +31,7 @@ from .state import SESSION, to_jsonable
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 log = logging.getLogger("cwe")
-app = FastAPI(title="Live Causal World Editor")
+app = FastAPI(title="Live Casual World Editor")
 
 _warm = {"state": "cold", "timings": {}}
 
