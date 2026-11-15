@@ -385,18 +385,29 @@ def place(scene, ents: list[Entity], radius: float, relation: str, ref: Entity |
         if best is None:
             notes.append(f"No free spot with a clear path next to {ref.label}; placed at the nearest free spot.")
     if best is None:
+        # spiral out from the reference (or the table centre) over the WHOLE table: a big object in the middle must
+        # not hide free space near the edges. Prefer spots the camera can see; fall back to any free spot.
         cx, cy = (t.x_min + t.x_max) / 2, (t.y_min + t.y_max) / 2
         centre = ref.pos[:2] if ref is not None else np.array([cx, cy])
-        for rr in np.linspace(0.05, 0.6, 24):
-            for k in range(24):
-                p = centre + rr * np.array([math.cos(2 * math.pi * k / 24), math.sin(2 * math.pi * k / 24)])
-                if free(p) and _visible(cam, [p[0], p[1], 0.02]):
+        reach = max(0.6, max(abs(t.x_min - centre[0]), abs(t.x_max - centre[0])) + max(abs(t.y_min - centre[1]), abs(t.y_max - centre[1])))
+        hidden = None
+        for rr in np.arange(0.05, reach + 0.025, 0.025):
+            for k in range(36):
+                p = centre + rr * np.array([math.cos(2 * math.pi * k / 36), math.sin(2 * math.pi * k / 36)])
+                if not free(p):
+                    continue
+                if _visible(cam, [p[0], p[1], 0.02]):
                     best = p
                     break
+                if hidden is None:
+                    hidden = p
             if best is not None:
                 break
+        if best is None and hidden is not None:
+            best = hidden
+            notes.append("The only free space on the table is outside the camera's view, so part of this happens off-screen.")
     if best is None:
-        raise ValueError("no free, visible spot on the table for that object")
+        raise ValueError("no free spot on the table for that object: the scan fills the whole table (try rescanning a clearer desk)")
     yaw = 0.0
     if ref is not None:
         d = ref.pos[:2] - best
