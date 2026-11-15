@@ -131,3 +131,19 @@ Everything runs on the laptop, free, offline; camera, voice and diagrams never l
 - **2026-11-14 (evening):** 🖐 Touch verified end to end in Chromium (scripted 3D hand -> live contact markers ->
   session ends -> replay recorded as a "hand" action -> chat report; no page errors). Toolbar now overlaps the hint
   pill (7 buttons): fix in the UI redesign.
+- **2026-11-14 (night):** landing page + one design system. "/" is now the landing page (paper and ink, offset
+  shadows, Bricolage Grotesque / Instrument Sans / IBM Plex Mono); every "Get started" opens the lab at "/lab/" with
+  an ink page-wipe. Landing additions: scroll reveals, count-up stats, reading-progress bar, active-section nav, a
+  live 🖐 Touch toy (2D rigid bodies, the pointer is a kinematic hand, contact forces in newtons), an animated
+  walk-around-scan explainer, a fourth "Use your hand" way, current numbers (151 tests) and honest limits. The lab
+  was restyled to the same theme (header, chat, cards, Studio, chemistry, AI Lab, modals, camera overlays), and the
+  Live AR tools moved off the camera into a grouped dock (Scan · Play · Result), so nothing covers the picture.
+  Verified with screenshots at desktop and phone widths (no horizontal overflow, no page errors), the Touch e2e on
+  /lab/, and 151 backend tests.
+
+## Demo notes from the redesign
+
+- Open on the landing page: the hero desk demo answers the chips, the Touch toy is a 10-second "your hand is
+  physics" moment before switching to the real lab.
+- Watch out: with the scripted e2e hand the peak contact marker read about 1500 N (a fast sweep starting inside an
+  object). Real hands come from above and read lower, but check the numbers before recording the video.
