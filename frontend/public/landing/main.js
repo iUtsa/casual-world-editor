@@ -317,7 +317,7 @@
     ctx.save();
     ctx.translate(cx, cy); ctx.rotate(gm.th);
     ctx.globalAlpha = alpha;
-    ctx.fillStyle = fill; ctx.strokeStyle = "#141414"; ctx.lineWidth = 2;
+    ctx.fillStyle = fill; ctx.strokeStyle = "#1e2622"; ctx.lineWidth = 2;
     ctx.beginPath(); ctx.rect(-size / 2, -size, size, size); ctx.fill(); ctx.stroke();
     ctx.restore();
   }
@@ -329,7 +329,7 @@
     const gm = geometry(p);
     const { top, bottom, corner, th } = gm;
     // ground
-    ctx.strokeStyle = "#141414"; ctx.lineWidth = 2;
+    ctx.strokeStyle = "#1e2622"; ctx.lineWidth = 2;
     ctx.beginPath(); ctx.moveTo(8, corner.y); ctx.lineTo(W - 8, corner.y); ctx.stroke();
     // ramp with hatch
     ctx.save();
@@ -339,12 +339,12 @@
     ctx.strokeStyle = "rgba(20,20,20,.18)"; ctx.lineWidth = 1;
     for (let i = -H; i < W; i += 9) { ctx.beginPath(); ctx.moveTo(i, corner.y); ctx.lineTo(i + H, corner.y - H); ctx.stroke(); }
     ctx.restore();
-    ctx.strokeStyle = "#141414"; ctx.lineWidth = 2.5; ctx.lineJoin = "round";
+    ctx.strokeStyle = "#1e2622"; ctx.lineWidth = 2.5; ctx.lineJoin = "round";
     ctx.beginPath(); ctx.moveTo(top.x, top.y); ctx.lineTo(bottom.x, bottom.y); ctx.lineTo(corner.x, corner.y); ctx.closePath(); ctx.stroke();
     // angle arc
     ctx.lineWidth = 1.5;
     ctx.beginPath(); ctx.arc(bottom.x, bottom.y, 34, Math.PI, Math.PI + th); ctx.stroke();
-    ctx.fillStyle = "#141414"; ctx.font = "500 13px 'IBM Plex Mono', monospace";
+    ctx.fillStyle = "#1e2622"; ctx.font = "500 13px 'IBM Plex Mono', monospace";
     ctx.fillText(`θ ${p.angle}°`, bottom.x - 58, bottom.y + 19);
 
     // playback state
@@ -375,7 +375,7 @@
     ctx.restore();
 
     // readouts
-    ctx.textAlign = "right"; ctx.fillStyle = "#141414"; ctx.font = "500 13px 'IBM Plex Mono', monospace";
+    ctx.textAlign = "right"; ctx.fillStyle = "#1e2622"; ctx.font = "500 13px 'IBM Plex Mono', monospace";
     const line = W < 520 ? `t ${fmt(tNow)} s  v ${fmt(v)} m/s` : `t ${fmt(tNow)} s   v ${fmt(v)} m/s   μ ${fmt(p.mu)}   g ${fmt(p.g)}`;
     ctx.fillText(line, W - 16, 16 + (W < 520 ? H * 0.42 : H * 0.36) + 22);
     ctx.textAlign = "left";
@@ -396,7 +396,7 @@
     const compact = W < 520;
     const cw = compact ? W * 0.44 : W * 0.32, ch = compact ? H * 0.42 : H * 0.36;
     const cx = W - cw - 16, cy = 16;
-    ctx.fillStyle = "#fff"; ctx.strokeStyle = "#141414"; ctx.lineWidth = 1.5;
+    ctx.fillStyle = "#fff"; ctx.strokeStyle = "#1e2622"; ctx.lineWidth = 1.5;
     ctx.beginPath(); ctx.rect(cx, cy, cw, ch); ctx.fill(); ctx.stroke();
     ctx.font = "500 11px 'IBM Plex Mono', monospace"; ctx.fillStyle = "#5f5a50";
     ctx.fillText("speed vs time", cx + 8, cy + 15);
@@ -518,7 +518,7 @@
     const r = document.createElementNS(NS, "rect");
     r.setAttribute("x", String(46 + i * 34)); r.setAttribute("y", "120");
     r.setAttribute("width", "10"); r.setAttribute("height", "60"); r.setAttribute("rx", "1.5");
-    r.setAttribute("fill", i % 2 ? "#fffdf8" : "#2f5bff"); r.setAttribute("stroke", "#141414"); r.setAttribute("stroke-width", "2");
+    r.setAttribute("fill", i % 2 ? "#fffdf8" : "#2f5bff"); r.setAttribute("stroke", "#1e2622"); r.setAttribute("stroke-width", "2");
     r.classList.add("domino");
     row.appendChild(r); dominoes.push(r);
   }
