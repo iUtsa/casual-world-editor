@@ -26,6 +26,7 @@ POSTER_AT = {"real": "answer", "imagine": "space"}
 times = json.loads((rec / "frames.json").read_text())
 marks = json.loads((rec / "marks.json").read_text())
 frames = sorted((rec / "frames").glob("*.jpg"))
+frames = frames[:len(times)]            # a frame can land just after the times were written
 assert len(frames) == len(times), (len(frames), len(times))
 
 
