@@ -154,7 +154,7 @@ def consistent_carve(grid: Grid, occ: np.ndarray, id_maps, poses, K, n_obj: int,
         tot = votes.sum(1)
         best = votes[:, 1:].max(1) if n_obj else np.zeros(len(P))
         bad = (tot >= 2) & ((best / np.maximum(tot, 1) < min_agree) | (votes[:, 0] >= 0.5 * tot))
-        if not bad.any():
+        if not bad.any() or bad.sum() < 0.002 * len(P):      # converged: what's left is boundary noise
             break
         occ[tuple(idx[bad].T)] = False
     return occ
