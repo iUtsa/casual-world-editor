@@ -26,6 +26,7 @@ import type { AnyRun, Asset, DiagramReading, ExpRun, ResultRow, Scene, ScenePayl
 import TheoryCheck from "./TheoryCheck";
 import HandLayer, { dragPush, targetsOf, type HandAction } from "./HandLayer";
 import Twin3D from "./Twin3D";
+import LiveTouch from "./LiveTouch";
 import ObjectCard from "./ObjectCard";
 import type { Pt } from "../geometry2d";
 import { api, type SweepJob } from "../api";
@@ -52,6 +53,7 @@ interface Props {
   onHand: (a: HandAction) => void;
   onBall: () => void;
   onSweepDone: (job: SweepJob) => Promise<void>; hfov: number;
+  onLiveSim: (s: Sim) => void; onLiveDone: (s: Sim) => void;
 }
 
 const NO_PICTURE = "There's no camera picture yet. Click the camera icon in the browser's address bar and allow it for this page "
@@ -66,6 +68,7 @@ export default function LiveAR(p: Props) {
   const video = useRef<HTMLVideoElement>(null);
   const [view, setView] = useState<"camera" | "3d">("camera");
   const [hands, setHands] = useState(false);
+  const [touch, setTouch] = useState(false);        // 🖐 Touch: live physical hand (exclusive with ✋ gestures)
   const [camErr, setCamErr] = useState<string | null>(null);
   const [camTry, setCamTry] = useState(0);
   const [aspect, setAspect] = useState(16 / 9);
@@ -169,6 +172,7 @@ export default function LiveAR(p: Props) {
   const toggleHands = () => {
     const on = !hands;
     setHands(on);
+    if (on) setTouch(false);
     if (on) setView("camera");
     fetch("/api/live/enabled", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ enabled: !on }) }).catch(() => {});
   };
@@ -214,6 +218,7 @@ export default function LiveAR(p: Props) {
               assets={p.assets} selected={p.selected} onPick={p.onSelect} />
           )}
           {scene && view === "camera" && hands && live && <HandLayer scene={scene} sim={shownSim} assets={p.assets} busy={!!p.busy} onAct={p.onHand} />}
+          {scene && view === "camera" && touch && live && <LiveTouch scene={scene} onSim={p.onLiveSim} onDone={p.onLiveDone} />}
           {scene && view === "camera" && diorama && <ARDiorama run={diorama} scene={scene} assets={p.assets} />}
           {panel && view === "camera" && (
             <div className="holo-panel">
@@ -274,6 +279,9 @@ export default function LiveAR(p: Props) {
             <input ref={sweepInput} type="file" accept="video/*" hidden onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; if (f) startSweep(f); }} />
             {scene && <button onClick={p.onBall} disabled={!!p.busy} title="Put a real-size virtual baseball on your desk — grab it with ✋ Hands and throw it at your things">🎾 Ball</button>}
             {scene && <button className={hands ? "on" : ""} onClick={toggleHands} title="Use your real hand: pinch to grab, flick to throw, swipe to push">✋ Hands{hands ? " on" : ""}</button>}
+            {scene && <button className={touch ? "on" : ""} disabled={!!p.busy}
+              onClick={() => { const on = !touch; setTouch(on); if (on) { setHands(false); setView("camera"); } }}
+              title="Your hand as physics, live: your fingers push, tip and flick things by touch">🖐 Touch{touch ? " on" : ""}</button>}
             {(run || shownSim) && <button onClick={p.onReplay} title="Replay">▶ Replay</button>}
             {(run || shownSim) && <button onClick={p.onOpenStudio} title="Every measurement as graphs, edit & compare">⧉ Graphs</button>}
           </div>
