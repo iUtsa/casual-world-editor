@@ -34,8 +34,8 @@ def _pred_from_points(P: np.ndarray, pose, K, hw, voxel: float) -> tuple[np.ndar
         return None
     m = np.zeros((h // 4 + 1, w // 4 + 1), np.uint8)
     r = max(1, int(np.ceil(0.5 * K[0, 0] * voxel / np.median(z[ok]) / 4)) + 1)
-    for x, y in zip((u[ok] / 4).astype(int), (v[ok] / 4).astype(int)):
-        cv2.circle(m, (int(x), int(y)), r, 1, -1)
+    m[(v[ok] / 4).astype(int), (u[ok] / 4).astype(int)] = 1          # mark, then grow every mark at once
+    m = cv2.dilate(m, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2 * r + 1, 2 * r + 1)))
     return m > 0, float(np.median(z[ok]))
 
 
