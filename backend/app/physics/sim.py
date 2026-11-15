@@ -1479,7 +1479,7 @@ def simulate(scene: Scene, baseline_qpos: np.ndarray, interventions: list[Interv
         rest_hold = 0.0
         n = 0
         max_steps = int((max_segment_s or config.MAX_SEGMENT_SECONDS) / dt)
-        if iv.type == "hand" and drive_until is not None:      # a hand session lasts as long as it was recorded
+        if any(x.type == "hand" for x in grp) and drive_until is not None:   # a hand session lasts as long as it was recorded
             max_steps = max(max_steps, int((drive_until - t + 3.0) / dt))
         max_speed = {oid: 0.0 for oid in world.ids}
 
