@@ -40,7 +40,7 @@ with sync_playwright() as p:
     b = p.chromium.launch(args=ARGS)
     pg = b.new_context(viewport={"width": 1600, "height": 960}, permissions=["camera"]).new_page()
     errs = []; pg.on("pageerror", lambda e: errs.append(str(e))); pg.on("console", lambda m: m.type == "error" and errs.append(m.text[:300]))
-    pg.goto("http://localhost:8000/")
+    pg.goto((sys.argv[2] if len(sys.argv) > 2 else "http://localhost:8000") + "/lab/")   # "/" is the landing page
     pg.wait_for_selector(".map-progress", timeout=60000); pg.wait_for_selector(".map-progress", state="detached", timeout=300000)
     print("videos after mapping:", pg.evaluate("[...document.querySelectorAll('.live-stage video')].map(v => ({rs: v.readyState, w: v.videoWidth, paused: v.paused, src: !!v.srcObject}))"))
     sc = pg.evaluate("fetch('/api/scene').then(r => r.json())")["scene"]
