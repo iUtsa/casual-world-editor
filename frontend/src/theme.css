@@ -5,9 +5,9 @@
    on top of them is paper.
    ================================================================================================= */
 :root:root:root {
-  --paper: #f6f4ee; --page: #f1eee5; --card: #fffdf8; --ink: #141414; --muted: #5f5a50; --soft: #d9d3c6; --shadow: #d3ccc0;
+  --paper: #f4f1e8; --page: #ece8dc; --card: #fffdf8; --ink: #1e2622; --muted: #5f5a50; --soft: #d9d3c6; --shadow: #d3ccc0;
   --orange: #ff5a1f; --orange-soft: #ffe2d4; --blue: #2f5bff; --blue-soft: #e3e9ff; --green: #13945b; --green-soft: #dcf3e7;
-  --yellow: #ffd23f; --red: #e5484d;
+  --yellow: #c8f135; --lime: #c8f135; --red: #e5484d;
   --bg: var(--paper); --panel: var(--card); --panel-solid: var(--card); --line: var(--soft);
   --accent: var(--blue); --accent-2: var(--orange); --accent-ink: #fff; --danger: var(--red); --ok: var(--green); --warn: #a5560c;
   --chip: #f1ede3; --series-1: #2f5bff; --grid: #e4ddcd;
@@ -66,9 +66,9 @@ button:active:not(:disabled) { transform: translate(2px, 2px); box-shadow: 1px 1
 button:disabled { opacity: .45; }
 button.on { background: var(--ink); color: var(--paper); border-color: var(--ink); }
 button.primary, .btn-glow, .chat-input .send, .player .play, .mini-player button {
-  background: var(--orange); color: #fff; border: 2px solid var(--ink); box-shadow: 3px 3px 0 var(--ink); font-weight: 700;
+  background: var(--lime); color: var(--ink); border: 2px solid var(--ink); box-shadow: 3px 3px 0 var(--ink); font-weight: 700;
 }
-button.primary:hover:not(:disabled), .btn-glow:hover, .chat-input .send:hover:not(:disabled) { background: #ff6a33; box-shadow: 4px 4px 0 var(--ink); }
+button.primary:hover:not(:disabled), .btn-glow:hover, .chat-input .send:hover:not(:disabled) { background: #d6f75c; box-shadow: 4px 4px 0 var(--ink); }
 button.link, .msg .link { background: none; border: none; box-shadow: none; color: var(--blue); padding: 2px 0; text-decoration: underline; text-underline-offset: 3px; transform: none !important; }
 button.link.danger { color: var(--red); }
 button.x, .obj-card .x { box-shadow: none; border: none; background: none; color: var(--muted); }
@@ -76,7 +76,7 @@ select, input, textarea {
   background: #fff; color: var(--ink); border: 1.5px solid var(--ink); border-radius: 9px; font-family: var(--sans);
 }
 input:focus, textarea:focus, select:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-soft); }
-input[type="range"] { accent-color: var(--orange); border: none; background: transparent; }
+input[type="range"] { accent-color: var(--ink); border: none; background: transparent; }
 input[type="checkbox"] { accent-color: var(--ink); }
 .cmd-input { background: #fff; border: 2px solid var(--ink); border-radius: 12px; box-shadow: 3px 3px 0 var(--shadow); font-size: 16px; }
 .chip {
@@ -167,7 +167,7 @@ input[type="checkbox"] { accent-color: var(--ink); }
 .pred i { background: var(--blue-soft); }
 .pred.first i { background: var(--orange-soft); } .pred.first b { color: var(--ink); }
 .tok { border: 1.5px solid var(--ink); }
-.chem-stage { background: #141414; }
+.chem-stage { background: #1e2622; }
 .chem-stage .empty { color: #e9e4d8; }
 .ai-controls { background: rgba(255, 253, 248, .94); border: 2px solid var(--ink); color: var(--ink); backdrop-filter: none; box-shadow: 4px 4px 0 rgba(0, 0, 0, .35); }
 .ai-slider b { color: var(--ink); }
@@ -209,7 +209,7 @@ input[type="checkbox"] { accent-color: var(--ink); }
 .map-progress li.done { color: var(--ink); } .map-progress li.done::before { color: var(--green); }
 .map-progress li.now { color: var(--ink); } .map-progress li.now::before { color: var(--orange); }
 .live-empty { color: #e9e4d8; }
-.twin3d { background: radial-gradient(900px 500px at 50% 30%, #2a2a2a 0%, #141414 70%); }
+.twin3d { background: radial-gradient(900px 500px at 50% 30%, #2a2a2a 0%, #1e2622 70%); }
 .holo-panel { border: 2px solid var(--ink); box-shadow: 5px 5px 0 rgba(0, 0, 0, .45); }
 .holo-title { color: var(--yellow); text-shadow: none; font-family: var(--mono); }
 
@@ -229,10 +229,10 @@ input[type="checkbox"] { accent-color: var(--ink); }
 .chat { background: var(--card); border: 2px solid var(--ink); border-radius: 16px; box-shadow: 6px 6px 0 var(--shadow); backdrop-filter: none; color: var(--ink); }
 aside.chat { padding: 0; gap: 0; }
 .app2 .chat-head { position: static; min-height: 0; border-bottom: 2px solid var(--ink); background: #f3efe5; padding: 12px 14px; backdrop-filter: none; }
-.mini-player input[type="range"] { accent-color: var(--orange); }
+.mini-player input[type="range"] { accent-color: var(--ink); }
 .chat-chips { -webkit-mask-image: linear-gradient(90deg, #000 88%, transparent); mask-image: linear-gradient(90deg, #000 88%, transparent); }
 .chat-head b { font: 700 15px var(--display); }
-.chat-avatar { background: var(--orange); border: 2px solid var(--ink); border-radius: 10px; box-shadow: 2px 2px 0 var(--ink); color: #fff; }
+.chat-avatar { background: var(--ink); border: 2px solid var(--ink); border-radius: 10px; box-shadow: 2px 2px 0 var(--lime); color: var(--lime); }
 .chat-hello { color: #2f2d28; }
 .msg .bubble { font-size: 13.5px; }
 .msg.user .bubble { background: var(--ink); color: var(--paper); border-radius: 14px 14px 4px 14px; }
@@ -264,13 +264,13 @@ aside.chat { padding: 0; gap: 0; }
 .obj-facts.hot div { background: #fff1d6; border-color: #a5560c; } .obj-facts.hot b { color: #7a3f06; }
 
 /* hands on the camera, in the theme's colours */
-.hand-skel line { stroke: #fffdf8; filter: drop-shadow(0 0 2px #141414); }
+.hand-skel line { stroke: #fffdf8; filter: drop-shadow(0 0 2px #1e2622); }
 .hand-skel circle { fill: var(--blue); stroke: #fffdf8; stroke-width: 1.5; }
-.hand-skel circle.tip { fill: var(--yellow); stroke: #141414; }
-.hand-skel.live line { stroke: #fffdf8; filter: drop-shadow(0 0 2px #141414); }
+.hand-skel circle.tip { fill: var(--yellow); stroke: #1e2622; }
+.hand-skel.live line { stroke: #fffdf8; filter: drop-shadow(0 0 2px #1e2622); }
 .hand-skel.live circle { fill: var(--green); }
 .touch-mark circle { fill: rgba(255, 90, 31, .25); stroke: var(--orange); stroke-width: 3; filter: none; }
-.touch-mark text { fill: #141414; paint-order: stroke; stroke: #fffdf8; stroke-width: 4px; font-family: var(--mono); }
+.touch-mark text { fill: #1e2622; paint-order: stroke; stroke: #fffdf8; stroke-width: 4px; font-family: var(--mono); }
 
 @media (max-width: 1000px) {
   .live-stage { max-height: none; }
