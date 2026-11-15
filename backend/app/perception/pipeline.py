@@ -114,6 +114,16 @@ def scan(rgb: np.ndarray, hfov_deg: float, source: str, use_claude: bool = True,
     for i, r in enumerate(st.records):
         r.label = f"object {i + 1}"
 
+    _label(st, rgb, use_claude, label, timings)
+    st.timings_ms = timings
+    rebuild(st)
+    return st
+
+
+
+
+def _label(st: PerceptionState, rgb: np.ndarray, use_claude: bool, label: bool, timings: dict) -> None:
+    """Names and materials for every record (Claude when available, else the local vision model)."""
     if st.records and label:
         t = time.perf_counter()
         labels = label_with_claude(rgb, [r.mask for r in st.records]) if use_claude else None
@@ -140,6 +150,23 @@ def scan(rgb: np.ndarray, hfov_deg: float, source: str, use_claude: bool = True,
                 if 0.005 < float(l.get("estimated_mass_kg") or 0) < 50:
                     r.mass_claude = float(l["estimated_mass_kg"])
                 r.label_source = st.labeler
+
+
+def scan_with_masks(rgb: np.ndarray, hfov_deg: float, source: str, depth: np.ndarray, masks: list[np.ndarray],
+                    use_claude: bool = True, label: bool = True) -> PerceptionState:
+    """Like scan(), but the objects are given (e.g. found by multi-view geometry in a sweep scan) instead of
+    proposed from one photo. depth: metres for every pixel (the sweep supplies an exact table plane)."""
+    timings: dict[str, float] = {}
+    img = Image.fromarray(rgb)
+    st = PerceptionState(scene_id=uuid.uuid4().hex[:10], source=source, rgb=rgb, depth_raw=depth, hfov_deg=hfov_deg)
+    _geometry(st)
+    st.sam = SamSession(img)
+    for m in masks:
+        st.records.append(ObjRecord(id=st.new_id(), mask=m.astype(bool), score=1.0, label=""))
+    _order_left_to_right(st)
+    for i, r in enumerate(st.records):
+        r.label = f"object {i + 1}"
+    _label(st, rgb, use_claude, label, timings)
     st.timings_ms = timings
     rebuild(st)
     return st
