@@ -1,4 +1,4 @@
-"""Build the Causal World Editor logo kit in logo/ from the master icon (docs/brand/cwe-icon-master.svg).
+"""Build the Casual World Editor logo kit in logo/ from the master icon (docs/brand/cwe-icon-master.svg).
 
 SVGs are pure vector (the wordmark is outlined, so no font is needed to display them); PNGs are rendered with Chromium.
 Usage: .venv/bin/python docs/brand/build_logo.py PATH/TO/BricolageGrotesque[opsz,wdth,wght].ttf"""
@@ -18,7 +18,7 @@ from playwright.sync_api import sync_playwright
 ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / "logo"
 INK, CREAM, LIME = "#1E2622", "#F4F1E8", "#C8F135"
-NAME = "Causal World Editor"
+NAME = "Casual World Editor"
 TAGLINE = ("What you imagine, ", "you can simulate.")
 
 master = (Path(__file__).parent / "cwe-icon-master.svg").read_text()
@@ -86,18 +86,18 @@ def main(font_path):
     files = {}
 
     # 1. app icons (tile)
-    files["cwe-icon"] = write("cwe-icon.svg", svg(512, 512, tile(INK, CREAM, LIME), "Causal World Editor app icon"))
-    files["cwe-icon-light"] = write("cwe-icon-light.svg", svg(512, 512, tile(CREAM, INK, LIME, INK), "Causal World Editor app icon, light"))
-    files["cwe-icon-lime"] = write("cwe-icon-lime.svg", svg(512, 512, tile(LIME, INK, CREAM, INK), "Causal World Editor app icon, lime"))
+    files["cwe-icon"] = write("cwe-icon.svg", svg(512, 512, tile(INK, CREAM, LIME), "Casual World Editor app icon"))
+    files["cwe-icon-light"] = write("cwe-icon-light.svg", svg(512, 512, tile(CREAM, INK, LIME, INK), "Casual World Editor app icon, light"))
+    files["cwe-icon-lime"] = write("cwe-icon-lime.svg", svg(512, 512, tile(LIME, INK, CREAM, INK), "Casual World Editor app icon, lime"))
 
     # 2. the mark alone, transparent background
     x, y, w, h = MARK_BOX
     def bare(body, title):
         return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}" viewBox="{x} {y} {w} {h}"><title>{title}</title>{body}</svg>\n')
-    files["cwe-mark"] = write("cwe-mark.svg", bare(mark(INK, LIME, INK), "Causal World Editor mark, for light backgrounds"))
-    files["cwe-mark-on-dark"] = write("cwe-mark-on-dark.svg", bare(mark(CREAM, LIME), "Causal World Editor mark, for dark backgrounds"))
-    files["cwe-mark-mono-ink"] = write("cwe-mark-mono-ink.svg", bare(mark(INK, INK, opacity=1), "Causal World Editor mark, one colour"))
-    files["cwe-mark-mono-white"] = write("cwe-mark-mono-white.svg", bare(mark("#FFFFFF", "#FFFFFF", opacity=1), "Causal World Editor mark, one colour white"))
+    files["cwe-mark"] = write("cwe-mark.svg", bare(mark(INK, LIME, INK), "Casual World Editor mark, for light backgrounds"))
+    files["cwe-mark-on-dark"] = write("cwe-mark-on-dark.svg", bare(mark(CREAM, LIME), "Casual World Editor mark, for dark backgrounds"))
+    files["cwe-mark-mono-ink"] = write("cwe-mark-mono-ink.svg", bare(mark(INK, INK, opacity=1), "Casual World Editor mark, one colour"))
+    files["cwe-mark-mono-white"] = write("cwe-mark-mono-white.svg", bare(mark("#FFFFFF", "#FFFFFF", opacity=1), "Casual World Editor mark, one colour white"))
 
     # 3. lockups: icon + outlined wordmark
     S = 512; size = 210; gap = 120
@@ -106,22 +106,22 @@ def main(font_path):
     for theme, txt, ico in (("", INK, tile(INK, CREAM, LIME)), ("-on-dark", CREAM, tile(CREAM, INK, LIME, INK))):
         d, tw = text_path(bold, NAME, size, x0=S + gap, baseline=base, tracking=-0.02)
         W = S + gap + tw + 8
-        files[f"cwe-logo-horizontal{theme}"] = write(f"cwe-logo-horizontal{theme}.svg", svg(W, S, ico + f'<path d="{d}" fill="{txt}"/>', f"Causal World Editor logo{theme.replace('-', ' ')}"))
+        files[f"cwe-logo-horizontal{theme}"] = write(f"cwe-logo-horizontal{theme}.svg", svg(W, S, ico + f'<path d="{d}" fill="{txt}"/>', f"Casual World Editor logo{theme.replace('-', ' ')}"))
         # stacked: icon over two-line wordmark
         ls = 190
-        d1, w1 = text_path(bold, "Causal World", ls, tracking=-0.02); d2, w2 = text_path(bold, "Editor", ls, tracking=-0.02)
+        d1, w1 = text_path(bold, "Casual World", ls, tracking=-0.02); d2, w2 = text_path(bold, "Editor", ls, tracking=-0.02)
         W2 = max(w1, w2, S) + 40
         top = S + 110 + cap_height(bold, ls)
-        d1, _ = text_path(bold, "Causal World", ls, x0=(W2 - w1) / 2, baseline=top, tracking=-0.02)
+        d1, _ = text_path(bold, "Casual World", ls, x0=(W2 - w1) / 2, baseline=top, tracking=-0.02)
         d2, _ = text_path(bold, "Editor", ls, x0=(W2 - w2) / 2, baseline=top + ls * 1.02, tracking=-0.02)
         H2 = top + ls * 1.02 + 60
-        files[f"cwe-logo-stacked{theme}"] = write(f"cwe-logo-stacked{theme}.svg", svg(W2, H2, f'<g transform="translate({(W2 - S) / 2:.1f} 0)">{ico}</g><path d="{d1} {d2}" fill="{txt}"/>', f"Causal World Editor logo, stacked{theme.replace('-', ' ')}"))
+        files[f"cwe-logo-stacked{theme}"] = write(f"cwe-logo-stacked{theme}.svg", svg(W2, H2, f'<g transform="translate({(W2 - S) / 2:.1f} 0)">{ico}</g><path d="{d1} {d2}" fill="{txt}"/>', f"Casual World Editor logo, stacked{theme.replace('-', ' ')}"))
 
     # 4. wordmark alone
     for theme, txt in (("", INK), ("-on-dark", CREAM)):
         capH = cap_height(bold, 200)
         d, tw = text_path(bold, NAME, 200, x0=4, baseline=capH + 50, tracking=-0.02)
-        files[f"cwe-wordmark{theme}"] = write(f"cwe-wordmark{theme}.svg", svg(tw + 8, capH + 100, f'<path d="{d}" fill="{txt}"/>', "Causal World Editor wordmark"))
+        files[f"cwe-wordmark{theme}"] = write(f"cwe-wordmark{theme}.svg", svg(tw + 8, capH + 100, f'<path d="{d}" fill="{txt}"/>', "Casual World Editor wordmark"))
 
     # 5. Devpost thumbnail / cover (3:2) and a 16:9 banner, all outlined
     def cover(W, H, title):
@@ -151,8 +151,8 @@ def main(font_path):
                      f'<path d="{d}" fill="{CREAM}" fill-opacity="0.9"/>')
             cx += cw + g
         return svg(W, H, body, title, bg=INK)
-    files["devpost-thumbnail"] = write("devpost-thumbnail.svg", cover(1500, 1000, "Causal World Editor, Devpost thumbnail"))
-    files["cover-16x9"] = write("cover-16x9.svg", cover(1920, 1080, "Causal World Editor cover"))
+    files["devpost-thumbnail"] = write("devpost-thumbnail.svg", cover(1500, 1000, "Casual World Editor, Devpost thumbnail"))
+    files["cover-16x9"] = write("cover-16x9.svg", cover(1920, 1080, "Casual World Editor cover"))
 
     # 6. PNGs
     png = OUT / "png"; png.mkdir(exist_ok=True)
