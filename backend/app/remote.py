@@ -4,6 +4,7 @@ Frames go phone -> this Mac over the local network only."""
 from __future__ import annotations
 
 import io
+import re
 import socket
 import subprocess
 import threading
@@ -44,18 +45,30 @@ def ensure_cert() -> tuple[Path, Path]:
     return key, crt
 
 
-def connect_info() -> dict:
+PUBLIC_ORIGIN = re.compile(r"https://[a-z0-9-]+(\.[a-z0-9-]+)+")   # e.g. https://causalworld.pages.dev
+
+
+def _qr(url: str) -> str:
     import qrcode
     import qrcode.image.svg
+    img = qrcode.make(url, image_factory=qrcode.image.svg.SvgPathImage, box_size=8, border=2)
+    buf = io.BytesIO()
+    img.save(buf)
+    return buf.getvalue().decode()
+
+
+def connect_info(origin: str | None = None) -> dict:
+    """Where the phone should go. Opened through a public HTTPS address (the hosted demo), the phone uses that
+    address too: any network, a real certificate. Opened locally, the phone uses this Mac's LAN address."""
+    if origin and PUBLIC_ORIGIN.fullmatch(origin.lower()):
+        url = f"{origin.lower()}/phone"
+        return {"ok": True, "public": True, "https_url": url, "http_url": url, "qr_svg": _qr(url)}
     ip = lan_ip()
     if ip is None:
         return {"ok": False, "reason": "This Mac isn't on a network."}
     https = f"https://{ip}:{HTTPS_PORT}/phone"
     http = f"http://{ip}:{HTTP_PORT}/phone"
-    img = qrcode.make(https, image_factory=qrcode.image.svg.SvgPathImage, box_size=8, border=2)
-    buf = io.BytesIO()
-    img.save(buf)
-    return {"ok": True, "ip": ip, "https_url": https, "http_url": http, "qr_svg": buf.getvalue().decode()}
+    return {"ok": True, "public": False, "ip": ip, "https_url": https, "http_url": http, "qr_svg": _qr(https)}
 
 
 def put_frame(jpeg: bytes, meta: dict | None = None) -> None:
