@@ -1,5 +1,5 @@
 #!/bin/bash
-# Put Casual World Editor online at https://causalworld.pages.dev, served from this Mac.
+# Put Casual World Editor online at https://casual-world-editor.pages.dev, served from this Mac.
 #   - the landing page is hosted by Cloudflare Pages (stays up when the Mac is off)
 #   - the lab, API, live hand and phone camera go through a Cloudflare quick tunnel to this Mac
 # Quick tunnels can expire (after the Mac sleeps, Cloudflare answers "Tunnel not found"), so this script checks the
@@ -9,7 +9,7 @@ set -euo pipefail
 export PATH="$HOME/.local/bin:$PATH"          # cloudflared lives here (official binary)
 cd "$(dirname "$0")/.."
 ROOT=$(pwd)
-PROJECT=causalworld
+PROJECT=casual-world-editor
 PAGES=$ROOT/deploy/pages
 LOG=$ROOT/data/tunnel.log
 mkdir -p "$ROOT/data"
