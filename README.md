@@ -1,39 +1,58 @@
 <div align="center">
 
-<a href="https://causalworld.pages.dev"><img src="docs/assets/banner.png" alt="Causal World Editor: stop imagining, start simulating" width="100%"></a>
+<a href="https://causalworld.pages.dev"><img src="docs/assets/banner.png" alt="Causal World Editor: what you imagine, you can simulate" width="100%"></a>
 
 <br>
 
-**Your desk becomes a physics world. Ask “what if?”, push things with your real hand, and check every answer against textbook theory.**
+**What you imagine, you can simulate.** Point a camera at the real world, snap a diagram, or just describe a world that doesn't exist. Ask “what if?”, push things with your real hand, and check every answer against theory.
 
-[![Live demo](https://img.shields.io/badge/live_demo-causalworld.pages.dev-ff5a1f?style=for-the-badge&labelColor=141414)](https://causalworld.pages.dev)
-[![License](https://img.shields.io/badge/license-Apache_2.0-2f5bff?style=for-the-badge&labelColor=141414)](LICENSE)
-[![Tests](https://img.shields.io/badge/tests-151_passing-13945b?style=for-the-badge&labelColor=141414)](#-accuracy-you-can-check)
-[![On-device](https://img.shields.io/badge/runs-100%25_on--device-ffd23f?style=for-the-badge&labelColor=141414)](#-private-by-design)
+[![Live demo](https://img.shields.io/badge/live_demo-causalworld.pages.dev-C8F135?style=for-the-badge&labelColor=1E2622)](https://causalworld.pages.dev)
+[![License](https://img.shields.io/badge/license-Apache_2.0-F4F1E8?style=for-the-badge&labelColor=1E2622)](LICENSE)
+[![Tests](https://img.shields.io/badge/tests-151_passing-13945b?style=for-the-badge&labelColor=1E2622)](#-accuracy-you-can-check)
+[![On-device](https://img.shields.io/badge/runs-100%25_on--device-C8F135?style=for-the-badge&labelColor=1E2622)](#-private-by-design)
 
-![Python](https://img.shields.io/badge/Python_3.12-141414?style=flat-square&logo=python&logoColor=ffd23f)
-![FastAPI](https://img.shields.io/badge/FastAPI-141414?style=flat-square&logo=fastapi&logoColor=13945b)
-![React](https://img.shields.io/badge/React_18-141414?style=flat-square&logo=react&logoColor=61dafb)
-![Three.js](https://img.shields.io/badge/Three.js-141414?style=flat-square&logo=threedotjs&logoColor=white)
-![MuJoCo](https://img.shields.io/badge/MuJoCo-141414?style=flat-square)
-![MediaPipe](https://img.shields.io/badge/MediaPipe-141414?style=flat-square&logo=google&logoColor=white)
-![Apple Silicon](https://img.shields.io/badge/Apple_Silicon-141414?style=flat-square&logo=apple&logoColor=white)
+![Python](https://img.shields.io/badge/Python_3.12-1E2622?style=flat-square&logo=python&logoColor=C8F135)
+![FastAPI](https://img.shields.io/badge/FastAPI-1E2622?style=flat-square&logo=fastapi&logoColor=13945b)
+![React](https://img.shields.io/badge/React_18-1E2622?style=flat-square&logo=react&logoColor=61dafb)
+![Three.js](https://img.shields.io/badge/Three.js-1E2622?style=flat-square&logo=threedotjs&logoColor=white)
+![MuJoCo](https://img.shields.io/badge/MuJoCo-1E2622?style=flat-square)
+![MediaPipe](https://img.shields.io/badge/MediaPipe-1E2622?style=flat-square&logo=google&logoColor=white)
+![Apple Silicon](https://img.shields.io/badge/Apple_Silicon-1E2622?style=flat-square&logo=apple&logoColor=white)
 
-[**Try it**](https://causalworld.pages.dev) · [Features](#-what-it-does) · [How it works](#-how-it-works) · [Accuracy](#-accuracy-you-can-check) · [Quick start](#-quick-start) · [Roadmap](#-roadmap)
+[**Try it**](https://causalworld.pages.dev) · [Watch](#-see-it-work) · [Features](#-what-it-does) · [How it works](#-how-it-works) · [Accuracy](#-accuracy-you-can-check) · [Quick start](#-quick-start) · [Roadmap](#-roadmap)
 
 </div>
 
 ---
 
-## The problem
+## 🎬 See it work
 
-Textbooks show the first frame. A block on a ramp, two balls about to collide, a planet's orbit: students stare at a
-still picture and try to play the movie in their heads. Cognitive scientists call this **mental animation**, and it is
-hard, even for people who know the formulas. Labs that let you *try* things cost equipment most schools don't have.
+<table>
+<tr>
+<th width="50%">📷 In your world</th>
+<th width="50%">✨ In your imagination</th>
+</tr>
+<tr>
+<td><a href="https://causalworld.pages.dev/landing/media/real.mp4"><img src="docs/assets/real.gif" alt="The real app: a desk is mapped, an object inspected, a baseball dropped on it, the 3D twin orbited, and a hand pushes objects in Touch"></a></td>
+<td><a href="https://causalworld.pages.dev/landing/media/imagine.mp4"><img src="docs/assets/imagine.gif" alt="The real app: two blue whales collide, Jupiter is put in Earth's orbit, methane burns, and GPT-2 forms its next word layer by layer"></a></td>
+</tr>
+<tr>
+<td valign="top">A desk is <b>mapped</b> from one camera frame, an object <b>inspected</b>, <i>“drop a baseball on the red box”</i> <b>simulated and checked</b>, the 3D twin orbited, and a hand <b>pushes things</b> in 🖐 Touch.</td>
+<td valign="top">Nothing here was in front of a camera: <i>“two blue whales collide”</i>, <i>“what if Jupiter orbited Earth?”</i>, <i>“methane + oxygen → carbon dioxide + water”</i>, and GPT-2 thinking. Each one a real simulation, measured.</td>
+</tr>
+</table>
 
-**Causal World Editor plays the movie.** Point a camera at your desk, or snap a photo of a diagram. It builds a 3D physics
-world from what it sees, lets you change anything, and shows the measured result next to the textbook prediction, so you
-get an answer you can verify, not a guess.
+<p align="center"><sub>Unedited recordings of the real app; waiting is fast-forwarded and marked on screen. Click either one for the full-quality video. The camera in the first is a rendered test desk so the run is repeatable.</sub></p>
+
+## From imagination to simulation
+
+Every idea starts as a picture in your head: a block on a ramp, two planets passing too close, a circuit you sketched,
+a reaction you're curious about. A still picture, a diagram or a formula only shows the first frame, and turning it into
+something you can actually test usually takes equipment, code or a lab.
+
+**Causal World Editor runs it.** Show it the real thing through a camera, photograph a diagram, or describe something
+that could never fit on a desk. It builds the world, simulates it with a real physics engine, lets you change anything,
+and shows the measured result next to the theoretical prediction, so you get an answer you can verify, not a guess.
 
 <p align="center"><img src="docs/assets/live-ar-answer.jpg" alt="Live AR: a scanned desk, a baseball dropped on the red box, measured results and theory check in the chat" width="92%"></p>
 
@@ -43,7 +62,7 @@ get an answer you can verify, not a guess.
 <tr>
 <td width="50%" valign="top">
 
-### 📷 Live AR
+### 📷 Live AR: your real world
 Scan your desk with the laptop webcam or your phone. Every object gets **size, mass, friction and what it rests on**.
 Click anything to inspect it, drag it to push it, or ask in plain words: *“drop a baseball on the book”*,
 *“what if the table were icy?”*, *“moon gravity”*.
@@ -81,16 +100,27 @@ Photograph a textbook page or whiteboard. A local vision model reads it into an 
 </tr>
 </table>
 
-### 🧪 Studio: every lab in one place
+### ✨ Studio: worlds you only describe
 
-<p align="center"><img src="docs/assets/studio-physics.jpg" alt="Studio physics lab" width="49%"> <img src="docs/assets/ai-lab.jpg" alt="AI Lab: GPT-2 thinking layer by layer" width="49%"></p>
+No camera needed. Type the world you're imagining, at any scale, and it gets built and simulated.
+
+<table>
+<tr>
+<td width="50%"><img src="docs/assets/studio-whales.jpg" alt="Two blue whales colliding in the physics lab"><br><b>⚛ Physics</b> · <i>“two blue whales collide at 10 m/s”</i></td>
+<td width="50%"><img src="docs/assets/studio-space.jpg" alt="Jupiter placed in Earth's orbit"><br><b>🪐 Space</b> · <i>“what if Jupiter orbited Earth?”</i></td>
+</tr>
+<tr>
+<td><img src="docs/assets/studio-chem.jpg" alt="Methane burning, molecules moving"><br><b>🧪 Chemistry</b> · <i>“methane + oxygen → carbon dioxide + water”</i></td>
+<td><img src="docs/assets/ai-lab.jpg" alt="AI Lab: GPT-2 thinking layer by layer"><br><b>🧠 AI Lab</b> · <i>“the cat sat on the”</i></td>
+</tr>
+</table>
 
 | Lab | Ask things like | Under the hood |
 |---|---|---|
 | ⚛ **Physics** | *“two blue whales collide at 10 m/s”*, *“line up 10 dominoes and knock them over”* | MuJoCo at real-world scale; toys scale properly (mass ∝ k³, speed ∝ √k) |
 | 🪐 **Space** | *“what if Jupiter orbited Earth?”*, *“Milky Way and Andromeda collide”* | REBOUND IAS15 from NASA JPL Horizons positions; tidal disruption, GW inspiral, mergers |
 | 🔌 **Circuits** | *“RC circuit with 100 µF and 1 kΩ”* | Modified nodal analysis (what SPICE uses), with transients |
-| 🧪 **Chemistry** | *“burn methane”* | Exact balancing, measured enthalpies, GFN2-xTB dynamics, DFT (M06-2X/def2-TZVP) |
+| 🧪 **Chemistry** | *“methane + oxygen → carbon dioxide + water”* | Exact balancing, measured enthalpies, GFN2-xTB dynamics, DFT (M06-2X/def2-TZVP) |
 | 🧠 **AI Lab** | *“the cat sat on the”* | A real GPT-2 on your machine: attention heads and the logit lens, layer by layer |
 
 ## ⚙ How it works
@@ -207,8 +237,20 @@ frontend/
   index.html            landing page (public/landing: styles, interactions, Touch toy)
   lab/index.html        the lab (React app in src/)
 deploy/                 Cloudflare Pages site + tunnel script for the public demo
+logo/                   logo kit: SVG + PNG icons, lockups, Devpost thumbnail
+docs/brand/             logo master, banner source and the scripts that build them
 assets/                 CC0 3D object library (licence per asset)
 ```
+
+## 🎨 Brand
+
+<img src="logo/svg/cwe-icon.svg" width="64" align="left" alt="Causal World Editor icon" hspace="12">
+
+The mark is a throw (a dashed arc and a ball landing), the smallest possible simulation. Icons, lockups for light and
+dark backgrounds, one-colour marks, a Devpost thumbnail and colour/type guidance are in **[`logo/`](logo/)**. Ink
+`#1E2622` · Paper `#F4F1E8` · Lime `#C8F135`.
+
+<br clear="left">
 
 ## 🙏 Credits
 
@@ -222,4 +264,4 @@ assets/                 CC0 3D object library (licence per asset)
 
 [Apache License 2.0](LICENSE). Third-party models and assets keep their own licences.
 
-<div align="center"><br><sub><b>Causal World Editor</b> · stop imagining, start simulating · <a href="https://causalworld.pages.dev">causalworld.pages.dev</a></sub></div>
+<div align="center"><br><sub><b>Causal World Editor</b> · what you imagine, you can simulate · <a href="https://causalworld.pages.dev">causalworld.pages.dev</a></sub></div>
