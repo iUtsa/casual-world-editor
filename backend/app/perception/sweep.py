@@ -126,7 +126,7 @@ def run(frames: list[np.ndarray], hfov_deg: float, source: str = "sweep", progre
     # the reference view through the one-frame pipeline (table plane, objects, labels), with calibrated depth
     t = time.perf_counter()
     progress("objects", 0.0, "finding objects in the reference view")
-    st = pipeline.scan(kf[ref], hfov_deg, source, use_claude=True, depth_override=r.depths[ref], label=label)
+    st, how = _reference_scene(kf, r, K, ref, hfov_deg, source, label, progress)
     T["objects"] = time.perf_counter() - t
     sc = st.scene
     R_wr, t_wr = np.array(sc.camera.R_wc), np.array(sc.camera.t_wc)       # world <- reference camera
@@ -134,7 +134,8 @@ def run(frames: list[np.ndarray], hfov_deg: float, source: str = "sweep", progre
     for k, (Rk, ck) in enumerate(r.poses):                               # sfm world = the reference camera's frame
         poses.append((R_wr @ Rk, R_wr @ ck + t_wr))
         ok_view.append(r.registered[k])
-    keep = [k for k in range(len(kf)) if ok_view[k]]
+    # masks on every other placed view (+ the reference): half the SAM work, carving still sees all sides
+    keep = [k for k in range(len(kf)) if ok_view[k] and (k % 2 == 0 or k == ref)]
     kf2 = [kf[k] for k in keep]
     poses2 = [poses[k] for k in keep]
     dep2 = [r.depths[k] if r.depth_err[k] < 0.05 else None for k in keep]
@@ -156,7 +157,8 @@ def run(frames: list[np.ndarray], hfov_deg: float, source: str = "sweep", progre
         unknown: list = []
         ids, flags = track.masks(kf2, poses2, K, gobjs, ref2, ref_masks, unknown_out=unknown,
                                  progress=lambda a, b: progress("carving", (rnd - 1 + 0.6 * a / b) / 2))
-        grid, occ = C.union_hull([m > 0 for m in ids], poses2, K, bounds, voxel=0.004 if rnd == 1 else 0.003,
+        # round 1 only feeds round 2's prompts: coarse voxels; round 2 builds the meshes
+        grid, occ = C.union_hull([m > 0 for m in ids], poses2, K, bounds, voxel=0.006 if rnd == 1 else 0.004,
                                  tol_frac=0.05, depths=dep2, margin=(0.015, 0.06), unknown=unknown)
         occ = C.consistent_carve(grid, occ, ids, poses2, K, n_obj, view_ok=flags)
         L, zbs = C.label_voxels(grid, occ, ids, poses2, K, n_obj, view_ok=flags)
@@ -164,6 +166,11 @@ def run(frames: list[np.ndarray], hfov_deg: float, source: str = "sweep", progre
             P = grid.centres(np.argwhere(L == i + 1))
             gobjs[i]["points"] = P if len(P) >= 20 else None
     T["carving"] = time.perf_counter() - t
+    # an "object" the carving finds no solid for (a shadow, a reflection) was a false detection: drop it
+    confirmed = {objs[i].id for i in range(n_obj) if gobjs[i]["points"] is not None}
+    dropped = [o.label for o in objs if o.id not in confirmed]
+    if dropped and confirmed:
+        st.records = [rec for rec in st.records if rec.id in confirmed]
 
     t = time.perf_counter()
     progress("meshes", 0.0, "meshes, textures and physics shapes")
@@ -171,6 +178,8 @@ def run(frames: list[np.ndarray], hfov_deg: float, source: str = "sweep", progre
     out_dir.mkdir(parents=True, exist_ok=True)
     notes = []
     for i, o in enumerate(objs):
+        if o.id not in confirmed:
+            continue
         res = C.object_mesh(L == i + 1, grid)
         if res is None:
             o.notes.append("sweep: not enough views to carve it; kept the one-photo shape")
@@ -188,9 +197,41 @@ def run(frames: list[np.ndarray], hfov_deg: float, source: str = "sweep", progre
     T["meshes"] = time.perf_counter() - t
     sc.timings_ms.update({f"sweep_{k}": round(v * 1000) for k, v in T.items()})
     sc.source = source
-    pose_note = f"{n_reg}/{len(kf)} views placed, reprojection error {r.rms_px:.2f} px, metric scale from depth x{r.metric_scale:.2f}"
+    pose_note = (f"{n_reg}/{len(kf)} views placed, reprojection error {r.rms_px:.2f} px, metric scale from depth x{r.metric_scale:.2f}; "
+                 f"objects {how}" + (f"; dropped (no 3D support): {', '.join(dropped)}" if dropped else ""))
     sc.warnings.append(f"Sweep scan: {pose_note}.")
     return SweepResult(st, len(kf), r.rms_px, pose_note, T, notes)
+
+
+def _reference_scene(kf, r, K, ref, hfov_deg, source, label, progress):
+    """The reference view's scene: table plane from the triangulated points, objects by plane + parallax
+    (discover.py), and a depth map that is exact on the table. Falls back to the one-photo pipeline."""
+    from PIL import Image
+
+    from . import discover, models, pipeline
+    X = r.points[np.isfinite(r.points[:, 0])]
+    h, w = kf[ref].shape[:2]
+    if len(X) >= 50:
+        pl = discover.fit_plane(X)
+        par = discover.parallax_map(kf, r.poses, K, ref, pl)
+        table = discover.table_region(pl, X, K, (h, w))
+        masks = discover.find_objects(kf[ref], par, table, models.SamSession(Image.fromarray(kf[ref])))
+        if masks:
+            progress("objects", 0.5, f"{len(masks)} objects rise above the table")
+            v, u = np.mgrid[0:h, 0:w]
+            rays = np.stack([(u - K[0, 2]) / K[0, 0], (v - K[1, 2]) / K[1, 1], np.ones((h, w))], -1)
+            denom = rays @ pl.n
+            with np.errstate(divide="ignore", invalid="ignore"):
+                z_plane = np.where(denom < -1e-6, -pl.d / denom, np.nan)        # depth of the table along each ray
+            da = r.depths[ref].astype(np.float32)
+            depth = np.where(np.isfinite(z_plane) & (z_plane < 8), z_plane, da).astype(np.float32)
+            obj = np.any(masks, axis=0)
+            # object pixels: the calibrated depth model, but always in front of the table they stand on
+            depth[obj] = np.minimum(da[obj], np.nan_to_num(z_plane[obj], nan=99.0) - 0.004)
+            st = pipeline.scan_with_masks(kf[ref], hfov_deg, source, depth, masks, use_claude=True, label=label)
+            return st, f"found by multi-view parallax ({len(masks)})"
+    st = pipeline.scan(kf[ref], hfov_deg, source, use_claude=True, depth_override=r.depths[ref], label=label)
+    return st, "found in one photo (parallax found none)"
 
 
 def apply_mesh(o, V: np.ndarray, F: np.ndarray, oid: int, frames, ids, zbs, poses, K, voxel: float, flags,
