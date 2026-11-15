@@ -45,7 +45,7 @@ def ensure_cert() -> tuple[Path, Path]:
     return key, crt
 
 
-PUBLIC_ORIGIN = re.compile(r"https://[a-z0-9-]+(\.[a-z0-9-]+)+")   # e.g. https://causalworld.pages.dev
+PUBLIC_ORIGIN = re.compile(r"https://[a-z0-9-]+(\.[a-z0-9-]+)+")   # e.g. https://casual-world-editor.pages.dev
 
 
 def _qr(url: str) -> str:
