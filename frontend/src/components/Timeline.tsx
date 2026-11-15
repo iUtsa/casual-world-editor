@@ -16,7 +16,7 @@ export default function Timeline({ sim, highlight }: { sim: Sim | null; highligh
   return (
     <div className="timeline">
       <button onClick={() => (clock.playing ? clock.pause() : clock.play())}>{clock.playing ? "❚❚" : "▶"}</button>
-      <button onClick={() => clock.play(sim.segments[sim.segments.length - 1].t_start)} title="replay the latest intervention">↺ last</button>
+      <button onClick={() => clock.play(sim.segments[sim.segments.length - 1]?.t_start ?? 0)} title="replay the latest intervention">↺ last</button>
       <div className="track"
         onPointerDown={(e) => {
           const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
