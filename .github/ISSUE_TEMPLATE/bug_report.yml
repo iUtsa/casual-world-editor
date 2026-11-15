@@ -1,0 +1,29 @@
+name: Bug report
+description: Something doesn't work or a result looks physically wrong
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you did, what you expected, and what you saw. Screenshots help.
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options: [Live AR scan, 🖐 Touch / hands, Walk-around 3D scan, Diagram reading, Studio physics, Space, Circuits, Chemistry, AI Lab, Landing page, Hosted demo]
+    validations:
+      required: true
+  - type: input
+    id: machine
+    attributes:
+      label: Machine
+      placeholder: e.g. M1 MacBook Air 8 GB, macOS 14, Chrome 131
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or numbers
+      description: Server output, browser console errors, or the measured vs. expected values.
+      render: text
